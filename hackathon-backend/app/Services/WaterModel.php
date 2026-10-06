@@ -8,6 +8,7 @@ use App\Models\Lgu;
 use App\Models\OutageScenario;
 use App\Models\Site;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Every formula in the concept doc ("Data and model"), per LGU.
@@ -340,7 +341,7 @@ class WaterModel
                 'after' => round((float) $rows->avg('days_after'), 1),
             ],
             'phases' => [
-                ['phase' => 1, 'label' => "Pilot, {$targets->count()} barangay(s), 6 months", 'cost_php' => $costPhp, 'tanks' => $tanks, 'drum_covers' => $input['drum_covers'], 'cards' => $input['cards']],
+                ['phase' => 1, 'label' => "Pilot, {$targets->count()} ".Str::plural('barangay', $targets->count()).', 6 months', 'cost_php' => $costPhp, 'tanks' => $tanks, 'drum_covers' => $input['drum_covers'], 'cards' => $input['cards']],
                 ['phase' => 2, 'label' => 'Citywide rollout, per year (years 2–3)', 'cost_php' => ['min' => (int) $rollout['min'], 'max' => (int) $rollout['max']], 'tanks' => 2 * $barangays->count(), 'drum_covers' => 0, 'cards' => 0],
             ],
             'funding_tag' => (string) ($funding['source'] ?? 'LDRRMF 70% preparedness share (RA 10121)'),

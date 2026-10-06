@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { endpoints } from "@/lib/api";
 import { days, liters, num, OUTCOME, STATUS } from "@/lib/format";
-import type { BarangayDetail, BarangayList, BarangaySummary, BoundaryFeature, OutageRun, OutageScenario, ReuseRules, Site, SiteMatches } from "@/lib/types";
+import type { BarangayDetail, BarangayList, BarangaySummary, OutageRun, Site, SiteMatches } from "@/lib/types";
+import { useLguData } from "@/lib/use-lgu-data";
 import type { MapView } from "./barangay-map";
 import { BarangayPanel } from "./barangay-panel";
 import { SitePanel } from "./site-panel";
@@ -17,12 +18,14 @@ const BarangayMap = dynamic(() => import("./barangay-map"), {
 });
 
 export function MapScreen() {
-  const [list, setList] = useState<BarangayList | null>(null);
-  const [sites, setSites] = useState<Site[]>([]);
-  const [boundaries, setBoundaries] = useState<BoundaryFeature[]>([]);
-  const [scenarios, setScenarios] = useState<OutageScenario[]>([]);
-  const [rules, setRules] = useState<ReuseRules | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { data, error: loadError } = useLguData();
+  const list = data?.list ?? null;
+  const sites = useMemo(() => data?.sites ?? [], [data]);
+  const boundaries = useMemo(() => data?.boundaries ?? [], [data]);
+  const scenarios = useMemo(() => data?.scenarios ?? [], [data]);
+  const rules = data?.rules ?? null;
+  const [actionError, setError] = useState<string | null>(null);
+  const error = loadError ?? actionError;
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detail, setDetail] = useState<BarangayDetail | null>(null);
@@ -36,37 +39,6 @@ export function MapScreen() {
   // Only the latest click may fill the panel, even if an earlier request answers last.
   const latestBarangay = useRef<number | null>(null);
   const latestSite = useRef<number | null>(null);
-
-  // Initial load: LGU → barangays, sites, scenarios, rules in parallel.
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const { lgus } = await endpoints.lgus();
-        const slug = lgus[0]?.slug;
-        if (!slug) throw new Error("No LGU configured");
-        const [b, s, sc, r, geo] = await Promise.all([
-          endpoints.barangays(slug),
-          endpoints.sites(slug),
-          endpoints.outageScenarios(slug),
-          endpoints.reuseRules(),
-          // Boundaries are optional: without them the map draws circles.
-          endpoints.boundaries(slug).catch(() => null),
-        ]);
-        if (cancelled) return;
-        setBoundaries(geo?.features ?? []);
-        setList(b);
-        setSites(s.sites);
-        setScenarios(sc.scenarios);
-        setRules(r);
-      } catch (e) {
-        if (!cancelled) setError((e as Error).message);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   // Outage run whenever the toggle or scenario changes.
   useEffect(() => {

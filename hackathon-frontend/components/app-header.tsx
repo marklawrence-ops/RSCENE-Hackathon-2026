@@ -2,7 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 // Add a route here when its page lands.
-const NAV = [{ href: "/", label: "Map" }];
+const NAV = [
+  { href: "/", label: "Map" },
+  { href: "/designer", label: "Designer" },
+];
 
 export function AppHeader() {
   return (

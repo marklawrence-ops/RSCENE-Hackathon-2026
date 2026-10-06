@@ -69,7 +69,9 @@ Site panel (click a pin; replaces the barangay panel, `‹ back`):
 │ [Run outage with this program ▸] │  mini-map of selected barangays, recoloured│
 └──────────────────────────────────┴────────────────────────────────────────────┘
 ```
-Sliders call `program-preview` (debounce 300 ms). Mock data already turns Manguehay amber → green.
+Built: sliders call `program-preview` (debounced 250 ms); click barangays on the map to add/remove them; "Load demo"
+sets Bangon + 5 tanks + 80 covers + 60 cards + 30% (red → green, ₱113k–182k); "Run outage with this program"
+compares the scenario with and without the program.
 
 ## `/storage`: Storage Registry
 
