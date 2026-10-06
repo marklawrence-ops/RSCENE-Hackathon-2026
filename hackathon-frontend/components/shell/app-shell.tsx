@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { endpoints } from "@/lib/api";
 import { signOutLocally, useAuthUser } from "@/lib/auth";
+import type { Role } from "@/lib/types";
 import { Icon, type IconName } from "./icon";
 import { Weather } from "./weather";
 
@@ -21,18 +22,28 @@ const NAV: { href: string; label: string; icon: IconName; auth?: boolean }[] = [
   { href: "/about", label: "About & credits", icon: "people" },
 ];
 
-const BOTTOM_SIGNED_IN: { href: string; label: string; icon: IconName }[] = [
-  { href: "/", label: "Home", icon: "grid" },
-  { href: "/map", label: "Map", icon: "map" },
-  { href: "/designer", label: "Plan", icon: "sliders" },
-  { href: "/form", label: "Form", icon: "clipboard" },
-];
-const BOTTOM_PUBLIC: { href: string; label: string; icon: IconName }[] = [
+type Tab = { href: string; label: string; icon: IconName };
+const HOME: Tab = { href: "/", label: "Home", icon: "grid" };
+const MAP: Tab = { href: "/map", label: "Map", icon: "map" };
+// Phone tabs follow each role's job; everything else stays in the account menu.
+const BOTTOM_BY_ROLE: Record<Role, Tab[]> = {
+  planner: [HOME, MAP, { href: "/designer", label: "Plan", icon: "sliders" }, { href: "/storage", label: "Registry", icon: "storage" }],
+  cdrrmo: [HOME, { href: "/map?outage=1", label: "Outage", icon: "storm" }, { href: "/designer", label: "Plan", icon: "sliders" }, { href: "/storage", label: "Registry", icon: "storage" }],
+  barangay: [HOME, MAP, { href: "/form", label: "Form", icon: "clipboard" }, { href: "/guide", label: "Guide", icon: "book" }],
+};
+const BOTTOM_PUBLIC: Tab[] = [
   { href: "/", label: "Home", icon: "grid" },
   { href: "/map", label: "Map", icon: "map" },
   { href: "/guide", label: "Guide", icon: "book" },
   { href: "/login", label: "Sign in", icon: "people" },
 ];
+
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("");
 
 export function Logo({ light = false }: { light?: boolean }) {
   return (
@@ -86,7 +97,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       <div className="-mx-4 mt-auto grid grid-cols-[36px_1fr_auto] items-center gap-2.5 border-t border-[#e6e9ea] px-4 pt-4">
         <div className="grid h-9 w-9 place-items-center rounded-full bg-[#d6a3e5] text-xs font-extrabold text-brand-ink">
-          {user ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : <Icon name="people" size={16} />}
+          {user ? initials(user.name) : <Icon name="people" size={16} />}
         </div>
         <div className="min-w-0">
           <strong className="block truncate text-xs">{user ? user.name : "Public view"}</strong>
@@ -114,7 +125,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const user = useAuthUser();
-  const bottom = user ? BOTTOM_SIGNED_IN : BOTTOM_PUBLIC;
+  const bottom = user ? BOTTOM_BY_ROLE[user.role] ?? BOTTOM_BY_ROLE.planner : BOTTOM_PUBLIC;
 
   return (
     <div className="flex h-dvh bg-white print:block print:h-auto">
@@ -153,7 +164,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <nav aria-label="Mobile navigation" className="grid h-16 shrink-0 grid-cols-5 border-t border-[#e1e5e6] bg-white shadow-[0_-2px_7px_rgba(28,56,58,.06)] lg:hidden print:hidden">
           {bottom.map((item) => {
-            const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const path = item.href.split("?")[0];
+            const active = path === "/" ? pathname === "/" : pathname.startsWith(path);
             return (
               <Link key={item.href} href={item.href} className={`flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold ${active ? "text-brand" : "text-[#616b6d]"}`}>
                 <Icon name={item.icon} size={21} />
@@ -161,10 +173,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
-          <button onClick={() => setOpen(true)} className="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold text-[#616b6d]">
-            <Icon name="menu" size={21} />
-            More
-          </button>
+          {user ? (
+            // Signed in: the last tab shows who you are and opens the menu (all pages, sign out).
+            <button
+              onClick={() => setOpen(true)}
+              aria-label={`Account: ${user.name}. Open menu`}
+              className="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold text-[#616b6d]"
+            >
+              <span className="relative grid h-[22px] w-[22px] place-items-center rounded-full bg-[#d6a3e5] text-[9px] font-extrabold text-brand-ink">
+                {initials(user.name)}
+                <span className="absolute -right-0.5 -bottom-0.5 h-2 w-2 rounded-full bg-[#4caf50] ring-2 ring-white" aria-hidden />
+              </span>
+              Account
+            </button>
+          ) : (
+            <button onClick={() => setOpen(true)} className="flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold text-[#616b6d]">
+              <Icon name="menu" size={21} />
+              More
+            </button>
+          )}
         </nav>
       </div>
     </div>
