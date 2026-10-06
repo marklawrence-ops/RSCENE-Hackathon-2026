@@ -32,8 +32,16 @@ const DATA: Credit[] = [
 ];
 
 const CONTEXT: Credit[] = [
-  { name: "Philippine Information Agency (PIA), July 8, 2026", what: "Report on the Catbalogan water rationing and class suspensions." },
-  { name: "Daily Tribune, July 7, 2026", what: "Report on the turbid source and power outage." },
+  {
+    name: "Daily Tribune, July 7, 2026",
+    href: "https://tribune.net.ph/2026/07/07/severe-water-crisis-hits-catbalogan-city",
+    what: "Heavy rain made the Antiao River too turbid to treat; a power outage stopped the Caramayon pumps.",
+  },
+  {
+    name: "Leyte Samar Daily News, July 21, 2026",
+    href: "https://www.leytesamardailynews.com/catbalogan-water-system-operating-at-just-30-capacity-amid-worsening-supply-crisis/",
+    what: "Supply fell to 30–40% of normal capacity; piped water was rotated by district, with water trucks.",
+  },
   { name: "Catbalogan Water District", what: "Water tariff used to price the value of reused and stored water." },
 ];
 
