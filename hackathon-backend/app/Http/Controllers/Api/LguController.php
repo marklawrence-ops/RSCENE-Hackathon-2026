@@ -9,6 +9,7 @@ use App\Models\OutageScenario;
 use App\Models\RainfallMonthly;
 use App\Models\Site;
 use App\Services\WaterModel;
+use App\Support\Boundaries;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -75,6 +76,24 @@ class LguController extends Controller
     public function storage(Lgu $lgu): JsonResponse
     {
         return response()->json(WaterModel::for($lgu)->storageRegistry(self::barangaysWithData($lgu)));
+    }
+
+    public function boundaries(Lgu $lgu): JsonResponse
+    {
+        $geojson = Boundaries::geojson($lgu->slug);
+        abort_if($geojson === null, 404, 'No boundaries for this LGU.');
+
+        $ids = $lgu->barangays()->pluck('id', 'name');
+        /** @var list<array{properties: array<string, mixed>}> $features */
+        $features = $geojson['features'] ?? [];
+
+        foreach ($features as &$feature) {
+            $feature['properties']['barangay_id'] = $ids[$feature['properties']['name']] ?? null;
+        }
+
+        return response()
+            ->json(['type' => 'FeatureCollection', 'source' => $geojson['source'] ?? null, 'features' => $features])
+            ->header('Cache-Control', 'public, max-age=86400');
     }
 
     public function rainfall(Lgu $lgu): JsonResponse

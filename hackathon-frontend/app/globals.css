@@ -25,6 +25,52 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Barangay shapes: colour changes (e.g. Outage Mode) fade instead of snapping. */
+.barangay-shape {
+  transition:
+    fill 0.45s ease,
+    fill-opacity 0.25s ease;
+}
+.barangay-shape:hover {
+  fill-opacity: 0.85;
+}
+.leaflet-container {
+  font-family: inherit;
+  background: #e8eef0;
+}
+/* Muted basemap so the barangay colours carry the meaning. */
+.leaflet-tile-pane {
+  filter: grayscale(0.85) brightness(1.04) contrast(0.92);
+}
+.leaflet-control-attribution {
+  font-size: 10px;
+}
+/* Phones pinch to zoom; the buttons would sit under the legend. */
+@media (max-width: 639px) {
+  .leaflet-control-zoom {
+    display: none;
+  }
+}
+
+/* Side panel content fades in when the selection changes. */
+.panel-in {
+  animation: panel-in 0.22s ease-out;
+}
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .barangay-shape {
+    transition: none;
+  }
+  .panel-in {
+    animation: none;
+  }
+}
+
 /* Map pins: ▲ installed tank, △ candidate roof, ■ business. */
 .site-pin-wrap {
   display: flex;

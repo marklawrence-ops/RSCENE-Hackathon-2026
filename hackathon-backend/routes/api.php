@@ -26,6 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/lgus/{lgu:slug}/outage-scenarios', [LguController::class, 'outageScenarios']);
     Route::get('/lgus/{lgu:slug}/storage', [LguController::class, 'storage']);
     Route::get('/lgus/{lgu:slug}/rainfall', [LguController::class, 'rainfall']);
+    Route::get('/lgus/{lgu:slug}/boundaries', [LguController::class, 'boundaries']);
     Route::get('/barangays/{barangay}', [BarangayController::class, 'show']);
     Route::get('/barangays/{barangay}/forms', [BarangayController::class, 'forms']);
     Route::get('/reuse-rules', [ReuseController::class, 'rules']);

@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { endpoints } from "@/lib/api";
 import { ADOPTION_STEPS, adoptionColor, days, liters, num, OUTCOME, STATUS } from "@/lib/format";
-import type { BarangayDetail, BarangayList, BarangaySummary, OutageRun, OutageScenario, ReuseRules, Site, SiteMatches } from "@/lib/types";
+import type { BarangayDetail, BarangayList, BarangaySummary, BoundaryFeature, OutageRun, OutageScenario, ReuseRules, Site, SiteMatches } from "@/lib/types";
 import type { MapView } from "./barangay-map";
 import { BarangayPanel } from "./barangay-panel";
 import { SitePanel } from "./site-panel";
@@ -19,6 +19,7 @@ const BarangayMap = dynamic(() => import("./barangay-map"), {
 export function MapScreen() {
   const [list, setList] = useState<BarangayList | null>(null);
   const [sites, setSites] = useState<Site[]>([]);
+  const [boundaries, setBoundaries] = useState<BoundaryFeature[]>([]);
   const [scenarios, setScenarios] = useState<OutageScenario[]>([]);
   const [rules, setRules] = useState<ReuseRules | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,13 +45,16 @@ export function MapScreen() {
         const { lgus } = await endpoints.lgus();
         const slug = lgus[0]?.slug;
         if (!slug) throw new Error("No LGU configured");
-        const [b, s, sc, r] = await Promise.all([
+        const [b, s, sc, r, geo] = await Promise.all([
           endpoints.barangays(slug),
           endpoints.sites(slug),
           endpoints.outageScenarios(slug),
           endpoints.reuseRules(),
+          // Boundaries are optional: without them the map draws circles.
+          endpoints.boundaries(slug).catch(() => null),
         ]);
         if (cancelled) return;
+        setBoundaries(geo?.features ?? []);
         setList(b);
         setSites(s.sites);
         setScenarios(sc.scenarios);
@@ -135,16 +139,6 @@ export function MapScreen() {
 
   const sitesById = useMemo(() => new Map(sites.map((s) => [s.id, s])), [sites]);
 
-  // Pins: installed tanks and businesses everywhere; candidate roofs for the selected barangay
-  // and, in Outage Mode, wherever a new tank would help most.
-  const visibleSites = useMemo(
-    () =>
-      sites.filter(
-        (s) => s.kind === "business" || s.tank.status === "installed" || s.barangay_id === selectedId || suggestedSiteIds.has(s.id),
-      ),
-    [sites, selectedId, suggestedSiteIds],
-  );
-
   const selected = list?.barangays.find((b) => b.id === selectedId) ?? null;
   const scenario = scenarios.find((s) => s.slug === scenarioSlug) ?? null;
 
@@ -163,7 +157,7 @@ export function MapScreen() {
     <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
       <section className="relative h-[55dvh] shrink-0 lg:h-auto lg:flex-1">
         {/* Outage Mode bar */}
-        <div className="absolute top-3 right-3 left-14 z-[1000] flex flex-wrap items-center gap-2 rounded-xl bg-white/95 p-2 text-sm shadow-md lg:right-auto dark:bg-zinc-900/95">
+        <div className="absolute top-3 right-3 left-3 z-[1000] flex flex-wrap items-center gap-2 rounded-xl bg-white/95 p-2 text-sm shadow-md lg:right-auto dark:bg-zinc-900/95">
           <button
             role="switch"
             aria-checked={outageOn}
@@ -199,10 +193,11 @@ export function MapScreen() {
         {list && (
           <BarangayMap
             barangays={list.barangays}
+            boundaries={boundaries}
             colorFor={colorFor}
             selectedId={selectedId}
             onSelect={selectBarangay}
-            sites={visibleSites}
+            sites={sites}
             selectedSiteId={site?.id ?? null}
             onSelectSite={selectSite}
             suggestedSiteIds={suggestedSiteIds}
@@ -226,7 +221,6 @@ export function MapScreen() {
             ))}
           </ul>
           <p className="mt-2 hidden text-zinc-500 sm:block">▲ tank · △ candidate roof · ■ business</p>
-          <p className="hidden text-zinc-500 sm:block">Circle size = population</p>
           <div className="mt-2 flex overflow-hidden rounded-lg border border-black/10 dark:border-white/15">
             {(["town", "city"] as const).map((v) => (
               <button
@@ -242,6 +236,7 @@ export function MapScreen() {
       </section>
 
       <aside className="min-h-0 flex-1 overflow-y-auto border-t border-black/10 bg-white p-4 lg:w-[400px] lg:flex-none lg:border-t-0 lg:border-l dark:border-white/10 dark:bg-zinc-950">
+        <div key={site ? `s${site.id}` : selected ? `b${selected.id}` : "city"} className="panel-in">
         {!list ? (
           <p className="text-sm text-zinc-500">Loading barangays…</p>
         ) : site ? (
@@ -259,6 +254,7 @@ export function MapScreen() {
         ) : (
           <CityOverview list={list} run={showOutage ? run : null} />
         )}
+        </div>
       </aside>
     </div>
   );

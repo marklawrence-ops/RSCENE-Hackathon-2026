@@ -327,6 +327,8 @@ function route(method: string, path: string, body: unknown): unknown {
   }
   if ((m = p.match(/^\/lgus\/[^/]+\/program-preview$/))) return programPreview(body as ProgramInput);
   if ((m = p.match(/^\/lgus\/[^/]+\/storage$/))) return storage();
+  // No mock polygons: the map falls back to circles.
+  if ((m = p.match(/^\/lgus\/[^/]+\/boundaries$/))) return { type: "FeatureCollection", source: null, features: [] };
   if ((m = p.match(/^\/lgus\/[^/]+\/rainfall$/))) {
     return {
       // Placeholder months until Open-Meteo is wired in; 2,991 mm a year split evenly.

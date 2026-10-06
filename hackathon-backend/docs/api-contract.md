@@ -131,8 +131,9 @@ type ProgramInput = {
 | 15 | `GET /barangays/{id}/forms` | – | Barangay Form history |
 | 16 | `POST /barangay-forms` | token | Barangay Form (offline sync) |
 | 17 | `GET /lgus/{lgu}/rainfall` | – | Detail panel, Designer |
+| 18 | `GET /lgus/{lgu}/boundaries` | – | Map shapes (v1.1) |
 
-Status: **all 17 live** (2026-10-06). Covered by `tests/Feature/WaterModelApiTest.php`.
+Status: **all 18 live** (2026-10-06). Covered by `tests/Feature/WaterModelApiTest.php`.
 
 ### 1. `GET /health`
 ```json
@@ -272,5 +273,6 @@ Request (all required except `notes`):
 - `Site.nonpotable_demand_lpd` and `Site.tank.days_of_cover`, so public buildings can show their own cover separately from household drums.
 - `program-preview` → each `barangays[]` row also has `greywater_reused_lpd_before` / `greywater_reused_lpd_after` (effect of the adoption slider).
 - `Lgu.default_bounds`: the map opens on the mainland town area (49 of 57 barangays). A "Whole city" button fits all barangays. All data and totals stay citywide.
+- #18 `GET /lgus/{lgu}/boundaries`: GeoJSON FeatureCollection of official barangay polygons (PSA/NAMRIA, PSGC Q4 2023), `properties: { name, psgc, area_km2, barangay_id }`, cached 1 day. Every barangay point and simulated site lies inside its own polygon. If an LGU has no file the endpoint is 404 and the map falls back to circles.
 - Outage days of cover now scale with the scenario's `supply_loss` (see #12).
 - Seed: the "turbid-power-cut" scenario lasts 3 days (matches the 3-day target). Demo barangay: **Bangon** (id 3), red → green with 5 tanks + 80 drum covers.

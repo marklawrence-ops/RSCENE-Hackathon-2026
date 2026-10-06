@@ -44,6 +44,7 @@ lgus 1─┬─* barangays 1─┬─* sites
 |---|---|---|---|---|
 | 1 | Catbalogan LGU + settings (90.09 L, usage split, runoff 0.8, drum 200 L, costs, tariff, LDRRMF) | real / assumed | Concept doc | Yes |
 | 2 | 57 barangays, 2020 population (sum 106,440) | real | PSA via PhilAtlas, `database/data/catbalogan_barangays.csv` | Yes |
+| 3b | Barangay boundaries: `database/data/boundaries/catbalogan.geojson` (PSA/NAMRIA via faeldon/philippines-json-maps, MIT) | real | served by `/boundaries`; sites are seeded inside their polygon | Yes |
 | 3 | Barangay coordinates (centroids) | real | OpenStreetMap (Nominatim), all 57 in the CSV | Yes |
 | 4 | `outage_vulnerability` | simulated | Stable hash of name (coastal/upland override later if time) | Yes |
 | 5 | 3 outage scenarios (turbid + power cut, dry season, typhoon) | simulated | July 2026 event | Yes |

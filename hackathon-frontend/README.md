@@ -36,4 +36,4 @@ Call the API only through `endpoints.*` in [lib/api.ts](lib/api.ts), so switchin
 
 ## Credits
 
-OpenStreetMap contributors and Leaflet (maps), Open-Meteo (rainfall), PSA (population), Next.js.
+OpenStreetMap contributors and Leaflet (maps), PSA/NAMRIA barangay boundaries, Open-Meteo (rainfall), PSA (population), Next.js.

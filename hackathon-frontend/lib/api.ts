@@ -4,6 +4,7 @@ import type {
   BarangayForm,
   BarangayFormInput,
   BarangayList,
+  Boundaries,
   Health,
   Lgu,
   OutageRun,
@@ -95,4 +96,5 @@ export const endpoints = {
   forms: (barangayId: number) => api<{ forms: BarangayForm[] }>(`/barangays/${barangayId}/forms`),
   submitForm: (form: BarangayFormInput) => api<{ form: BarangayForm }>("/barangay-forms", { method: "POST", body: form }),
   rainfall: (lgu: string) => api<Rainfall>(`/lgus/${lgu}/rainfall`),
+  boundaries: (lgu: string) => api<Boundaries>(`/lgus/${lgu}/boundaries`),
 };

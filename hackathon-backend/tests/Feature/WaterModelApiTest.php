@@ -5,6 +5,7 @@ use App\Models\Lgu;
 use App\Models\Site;
 use App\Models\User;
 use App\Services\WaterModel;
+use App\Support\Boundaries;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -145,6 +146,24 @@ test('storage registry totals match its rows', function () {
     expect($res->json('rows'))->toHaveCount(57)
         ->and($res->json('totals.storage_liters'))->toBe(collect($res->json('rows'))->sum('storage_liters'))
         ->and($res->json('totals.public_tanks'))->toBe(5);
+});
+
+test('boundaries cover every barangay and every site sits inside its own barangay', function () {
+    $res = $this->getJson('/api/v1/lgus/catbalogan/boundaries')
+        ->assertOk()
+        ->assertHeader('Cache-Control', 'max-age=86400, public');
+
+    $features = collect($res->json('features'));
+    expect($features)->toHaveCount(57)
+        ->and($features->pluck('properties.barangay_id')->filter()->unique())->toHaveCount(57);
+
+    foreach (Site::with('barangay')->get() as $site) {
+        $rings = Boundaries::rings('catbalogan', $site->barangay->name);
+        expect(Boundaries::contains($rings, $site->latitude, $site->longitude))->toBeTrue("{$site->name} is outside {$site->barangay->name}");
+    }
+    foreach (Barangay::all() as $b) {
+        expect(Boundaries::contains(Boundaries::rings('catbalogan', $b->name), $b->latitude, $b->longitude))->toBeTrue("{$b->name} point is outside its boundary");
+    }
 });
 
 test('rainfall, scenarios, lgus and reuse rules are public', function () {

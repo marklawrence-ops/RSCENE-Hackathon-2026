@@ -38,4 +38,4 @@ Other hosts (Forge, Railway, Render) work too: set the same variables, run `migr
 
 ## Credits
 
-PSA 2020 census via PhilAtlas (barangay populations), Open-Meteo (rainfall), Laravel, Sanctum.
+PSA 2020 census via PhilAtlas (barangay populations); PSA/NAMRIA barangay boundaries (PSGC Q4 2023) via [faeldon/philippines-json-maps](https://github.com/faeldon/philippines-json-maps) (MIT); OpenStreetMap contributors (barangay points); Open-Meteo (rainfall); Laravel, Sanctum.

@@ -206,6 +206,14 @@ export type StorageRegistry = {
   totals: { public_tanks: number; covered_drums: number; storage_liters: number; days_of_cover: number };
 };
 
+export type BoundaryFeature = {
+  type: "Feature";
+  properties: { name: string; psgc: string; area_km2: number; barangay_id: number | null };
+  geometry: { type: "Polygon"; coordinates: number[][][] } | { type: "MultiPolygon"; coordinates: number[][][][] };
+};
+
+export type Boundaries = { type: "FeatureCollection"; source: string | null; features: BoundaryFeature[] };
+
 export type Rainfall = {
   months: { year: number; month: number; rainfall_mm: number; source: "open-meteo" | "seed" }[];
   annual_mm: number;

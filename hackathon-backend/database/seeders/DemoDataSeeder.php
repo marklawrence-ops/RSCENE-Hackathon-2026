@@ -6,6 +6,7 @@ use App\Models\Barangay;
 use App\Models\BarangayForm;
 use App\Models\Lgu;
 use App\Models\Site;
+use App\Support\Boundaries;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -140,11 +141,21 @@ class DemoDataSeeder extends Seeder
     {
         $lat = $b->latitude ?? $lgu->latitude;
         $lng = $b->longitude ?? $lgu->longitude;
+        $rings = Boundaries::rings($lgu->slug, $b->name);
 
-        return [
-            'latitude' => round($lat + ($this->rand($key.'lat') - 0.5) * 0.003, 6),
-            'longitude' => round($lng + ($this->rand($key.'lng') - 0.5) * 0.003, 6),
-        ];
+        // Close to the settlement point (within ~400 m), and always inside the barangay's own boundary.
+        for ($try = 0; $try < 200; $try++) {
+            $spread = $try < 100 ? 0.007 : 0.02;
+            $point = [
+                'latitude' => round($lat + ($this->rand($key.'lat'.$try) - 0.5) * $spread, 6),
+                'longitude' => round($lng + ($this->rand($key.'lng'.$try) - 0.5) * $spread, 6),
+            ];
+            if ($rings === [] || Boundaries::contains($rings, $point['latitude'], $point['longitude'])) {
+                return $point;
+            }
+        }
+
+        return Boundaries::pointInside($lgu->slug, $b->name, $key) ?? ['latitude' => $lat, 'longitude' => $lng];
     }
 
     private function between(string $key, int|float $min, int|float $max): int
