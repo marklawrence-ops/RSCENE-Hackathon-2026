@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.rscene_hackathon_2026.twa",
+        "sha256_cert_fingerprints": ["FC:CD:DC:52:8D:C7:7D:66:0A:AA:1D:00:E3:41:37:71:58:A0:6C:0E:B3:C8:21:3A:01:18:A1:02:F7:3F:80:A2"]
+      }
+    }]
