@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Manrope } from "next/font/google";
+import { AppShell } from "@/components/shell/app-shell";
 import { ServiceWorkerRegister } from "./service-worker-register";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
@@ -14,11 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Circular Water Network Planner",
+  title: "AGOS · Circular Water",
   description:
     "Plan safe reuse of greywater and rain per barangay, and keep non-potable needs running when the main supply fails.",
-  applicationName: "Water Planner",
-  appleWebApp: { capable: true, title: "Water Planner", statusBarStyle: "default" },
+  applicationName: "AGOS",
+  appleWebApp: { capable: true, title: "AGOS", statusBarStyle: "default" },
   icons: {
     icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b5d6b",
+  themeColor: "#168d98",
   width: "device-width",
   initialScale: 1,
 };
@@ -35,10 +36,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${manrope.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <AppShell>{children}</AppShell>
         <ServiceWorkerRegister />
       </body>
     </html>

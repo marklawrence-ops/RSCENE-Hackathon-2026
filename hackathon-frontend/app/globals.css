@@ -1,28 +1,33 @@
 @import "tailwindcss";
 
+/* AGOS aqua theme (light only). The dark variant only applies under a .dark class, which the app never sets. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #25282a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand: #168d98;
+  --color-brand-dark: #10747c;
+  --color-brand-ink: #173d42;
+  --color-brand-soft: #eaf8f9;
+  --color-aqua: #53d3df;
+  --color-line: #e2e6e7;
+  --color-surface-2: #f2f5f6;
+  --color-muted: #737c7e;
+  --color-violet: #b878cf;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), system-ui, sans-serif;
 }
 
 /* Barangay shapes: colour changes (e.g. Outage Mode) fade instead of snapping. */
@@ -80,7 +85,7 @@ body {
   display: block;
   width: 14px;
   height: 14px;
-  border: 2px solid #0b5d6b;
+  border: 2px solid #168d98;
   background: #ffffff;
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
 }
@@ -90,10 +95,10 @@ body {
   border: 0;
 }
 .site-pin--tank {
-  background: #0b5d6b;
+  background: #168d98;
 }
 .site-pin--candidate {
-  background: #7fd1c7;
+  background: #53d3df;
 }
 .site-pin--business {
   border-radius: 2px;

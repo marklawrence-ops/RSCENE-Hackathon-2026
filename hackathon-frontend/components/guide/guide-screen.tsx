@@ -19,13 +19,13 @@ export function GuideScreen() {
               key={l}
               onClick={() => setLang(l)}
               aria-pressed={lang === l}
-              className={`px-3 py-1.5 ${lang === l ? "bg-[#0b5d6b] text-white" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
+              className={`px-3 py-1.5 ${lang === l ? "bg-brand text-white" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
             >
               {GUIDE[l].langName}
             </button>
           ))}
         </div>
-        <button onClick={() => window.print()} className="rounded-lg border border-[#0b5d6b]/40 px-3 py-1.5 text-sm font-medium text-[#0b5d6b] hover:bg-[#0b5d6b]/10 dark:text-[#7fd1c7]">
+        <button onClick={() => window.print()} className="rounded-lg border border-brand/40 px-3 py-1.5 text-sm font-medium text-brand hover:bg-brand/10 dark:text-aqua">
           🖨 {t.print}
         </button>
       </div>
@@ -36,7 +36,8 @@ export function GuideScreen() {
         </p>
       )}
 
-      <h1 className="mt-5 text-2xl font-semibold leading-tight print:mt-0">{t.title}</h1>
+      <p className="mt-5 text-[10px] font-extrabold tracking-[0.18em] text-brand print:hidden">FOR HOUSEHOLDS</p>
+      <h1 className="mt-1 text-3xl leading-tight font-extrabold tracking-[-0.035em] print:mt-0">{t.title}</h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400 print:text-black">{t.intro}</p>
 
       <section className="mt-5 rounded-2xl border border-emerald-600/30 bg-emerald-50 p-4 dark:bg-emerald-950/30 print:break-inside-avoid">
@@ -68,7 +69,7 @@ export function GuideScreen() {
         </ul>
       </section>
 
-      <section className="mt-3 rounded-2xl border border-[#0b5d6b]/30 bg-[#0b5d6b]/5 p-4 print:break-inside-avoid">
+      <section className="mt-3 rounded-2xl border border-brand/30 bg-brand/5 p-4 print:break-inside-avoid">
         <h2 className="text-lg font-semibold">🛢 {t.drumTitle}</h2>
         <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm">
           {t.drumItems.map((item) => (

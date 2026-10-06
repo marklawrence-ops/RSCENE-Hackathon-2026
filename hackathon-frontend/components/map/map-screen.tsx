@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { endpoints } from "@/lib/api";
 import { days, liters, num, OUTCOME, STATUS } from "@/lib/format";
@@ -17,7 +18,10 @@ const BarangayMap = dynamic(() => import("./barangay-map"), {
   loading: () => <div className="grid h-full place-items-center text-sm text-zinc-500">Loading map…</div>,
 });
 
+const isOutageParam = (p: { get(key: string): string | null } | null) => p?.get("outage") === "1";
+
 export function MapScreen() {
+  const searchParams = useSearchParams();
   const { data, error: loadError } = useLguData();
   const list = data?.list ?? null;
   const sites = useMemo(() => data?.sites ?? [], [data]);
@@ -32,7 +36,15 @@ export function MapScreen() {
   const [site, setSite] = useState<Site | null>(null);
   const [matches, setMatches] = useState<SiteMatches | null>(null);
 
-  const [outageOn, setOutageOn] = useState(false);
+  // /map?outage=1 (the "Outage Mode" link) opens with the simulation on.
+  const [outageOn, setOutageOn] = useState(() => isOutageParam(searchParams));
+  // Clicking "Outage Mode" while already on the map switches it on too.
+  const outageParam = isOutageParam(searchParams);
+  const [seenOutageParam, setSeenOutageParam] = useState(outageParam);
+  if (outageParam !== seenOutageParam) {
+    setSeenOutageParam(outageParam);
+    if (outageParam) setOutageOn(true);
+  }
   const [scenarioSlug, setScenarioSlug] = useState<string>("turbid-power-cut");
   const [run, setRun] = useState<OutageRun | null>(null);
   const [view, setView] = useState<MapView>("town");
@@ -197,7 +209,7 @@ export function MapScreen() {
               <button
                 key={v}
                 onClick={() => setView(v)}
-                className={`flex-1 px-2 py-1 ${view === v ? "bg-[#0b5d6b] text-white" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
+                className={`flex-1 px-2 py-1 ${view === v ? "bg-brand text-white" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
               >
                 {v === "town" ? "Town area" : "Whole city"}
               </button>

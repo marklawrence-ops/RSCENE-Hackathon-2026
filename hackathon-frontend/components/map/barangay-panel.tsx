@@ -43,7 +43,7 @@ export function BarangayPanel({ barangay: b, detail, outage, scenarioName, sites
             {outage.shortfall_liters > 0 && <> · short by {liters(outage.shortfall_liters)}</>}.
           </p>
           {suggested && (
-            <button onClick={() => onSelectSite(suggested)} className="mt-2 text-left text-[#0b5d6b] underline dark:text-[#7fd1c7]">
+            <button onClick={() => onSelectSite(suggested)} className="mt-2 text-left text-brand underline dark:text-aqua">
               Best roof for a new tank: {suggested.name} ›
             </button>
           )}
@@ -72,7 +72,7 @@ export function BarangayPanel({ barangay: b, detail, outage, scenarioName, sites
             <span>Greywater that could be reused</span>
             <span>{liters(m.greywater_lpd)}</span>
           </div>
-          <Bar value={m.greywater_lpd} max={m.greywater_lpd} color="#7fd1c7" />
+          <Bar value={m.greywater_lpd} max={m.greywater_lpd} color="#53d3df" />
         </div>
         <div>
           <div className="mb-1 flex justify-between text-xs text-zinc-500">
@@ -81,7 +81,7 @@ export function BarangayPanel({ barangay: b, detail, outage, scenarioName, sites
             </span>
             <span>{liters(reused)}</span>
           </div>
-          <Bar value={reused} max={m.greywater_lpd} color="#0b5d6b" />
+          <Bar value={reused} max={m.greywater_lpd} color="#168d98" />
         </div>
         <p className="text-sm">
           Reuse gap: <strong>{liters(m.reuse_gap_lpd)}</strong> a day

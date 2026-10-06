@@ -4,15 +4,17 @@ The concept has six screens, but we build **four routes**: Source-to-Use Matchin
 
 | Route | Screens it covers | Endpoints | Demo beat |
 |---|---|---|---|
-| `/` | 1 Reuse Network Map, 2 Source-to-Use Matching (site panel), 3 Outage Mode (toggle) | 5, 6, 7, 8, 9, 10, 11, 12 | Click a barangay; switch on the outage |
+| `/` | Overview (AGOS design): hero, live stats, map preview, action queue | 5, 6, 8, 14, 17 | Opening shot |
+| `/map` (`?outage=1`) | 1 Reuse Network Map, 2 Source-to-Use Matching (site panel), 3 Outage Mode (toggle) | 5, 6, 7, 8, 9, 10, 11, 12 | Click a barangay; switch on the outage |
 | `/designer` | 4 Program Designer | 13 (+12 to re-run the outage) | Add 5 tanks + covers → red to green |
 | `/storage` | 5 Storage Registry | 14 | (backup if asked) |
 | `/form` | 6 Barangay Form (offline) | 2, 16 | Airplane mode submit, then sync |
 | `/guide` | Household guide (public, no sign-in; printable card) | none (static; mirrors config/reuse.php) | Answer to "how do households take part?" |
 
-Shared shell: top bar `[logo] Water Planner   [LGU ▾ Catbalogan]   Map · Designer · Storage · Form   [login]`. On a phone the links collapse into a bottom tab bar.
+Shared shell (AGOS design, Oct 6 evening): left sidebar on desktop, aqua top bar with active LGU and live Open-Meteo weather,
+bottom tab bar + drawer on phones; Manrope; light theme only. Previous shell: top bar `[logo] Water Planner   [LGU ▾ Catbalogan]   Map · Designer · Storage · Form   [login]`. On a phone the links collapse into a bottom tab bar.
 
-## `/`: Reuse Network Map
+## `/map`: Reuse Network Map
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐

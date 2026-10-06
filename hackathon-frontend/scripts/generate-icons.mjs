@@ -14,8 +14,8 @@ for (const [file, size, pad] of out) {
   const inner = size - pad * 2;
   await sharp(src, { density: 384 })
     .resize(inner, inner)
-    .extend({ top: pad, bottom: pad, left: pad, right: pad, background: "#0b5d6b" })
-    .flatten({ background: "#0b5d6b" })
+    .extend({ top: pad, bottom: pad, left: pad, right: pad, background: "#168d98" })
+    .flatten({ background: "#168d98" })
     .png()
     .toFile(file);
   console.log(file);

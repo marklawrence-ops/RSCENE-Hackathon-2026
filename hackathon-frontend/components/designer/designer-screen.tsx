@@ -163,8 +163,11 @@ export function DesignerScreen() {
       {/* Controls */}
       <section className="shrink-0 border-b border-black/10 bg-white p-4 lg:w-[360px] lg:overflow-y-auto lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-zinc-950">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="text-lg font-semibold">Program Designer</h1>
-          <button onClick={loadDemo} className="rounded-lg border border-[#0b5d6b]/40 px-2.5 py-1 text-xs font-medium text-[#0b5d6b] hover:bg-[#0b5d6b]/10 dark:text-[#7fd1c7]">
+          <div>
+            <p className="text-[10px] font-extrabold tracking-[0.18em] text-brand">BUDGET &amp; IMPACT</p>
+            <h1 className="text-xl font-extrabold tracking-[-0.03em]">Program Designer</h1>
+          </div>
+          <button onClick={loadDemo} className="rounded-lg border border-brand/40 px-2.5 py-1 text-xs font-medium text-brand hover:bg-brand/10 dark:text-aqua">
             Load demo
           </button>
         </div>
@@ -173,7 +176,7 @@ export function DesignerScreen() {
         <Field label="Barangays">
           <div className="flex flex-wrap gap-1.5">
             {controls.wholeCity ? (
-              <span className="rounded-full bg-[#0b5d6b] px-2.5 py-1 text-xs font-medium text-white">All {list.barangays.length} barangays</span>
+              <span className="rounded-full bg-brand px-2.5 py-1 text-xs font-medium text-white">All {list.barangays.length} barangays</span>
             ) : (
               controls.ids.map((id) => (
                 <button
@@ -226,7 +229,7 @@ export function DesignerScreen() {
               <button
                 key={s}
                 onClick={() => update({ tank_liters: s })}
-                className={`flex-1 px-2 py-1.5 ${controls.tank_liters === s ? "bg-[#0b5d6b] text-white" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
+                className={`flex-1 px-2 py-1.5 ${controls.tank_liters === s ? "bg-brand text-white" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
               >
                 {num(s)} L
               </button>
@@ -262,13 +265,13 @@ export function DesignerScreen() {
       </section>
 
       {/* Results */}
-      <section className="flex min-w-0 flex-1 flex-col lg:flex-row">
-        <div className="shrink-0 space-y-4 p-4 lg:w-[400px] lg:overflow-y-auto">
+      <section className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto 2xl:flex-row 2xl:overflow-hidden">
+        <div className="shrink-0 space-y-4 p-4 2xl:w-[400px] 2xl:overflow-y-auto">
           {!preview || targetCount === 0 ? (
             <p className="text-sm text-zinc-500">{targetCount === 0 ? "Add a barangay to start." : "Calculating…"}</p>
           ) : (
             <div className={`space-y-4 transition-opacity ${pending ? "opacity-60" : ""}`}>
-              <div className="rounded-xl bg-[#0b5d6b] p-4 text-white">
+              <div className="rounded-xl bg-brand p-4 text-white">
                 <p className="text-xs uppercase tracking-wide text-white/70">Year-1 cost</p>
                 <p className="text-3xl font-semibold tabular-nums">
                   {peso(preview.cost_php.min)} – {peso(preview.cost_php.max)}
@@ -388,7 +391,7 @@ export function DesignerScreen() {
           )}
         </div>
 
-        <div className="relative h-[50dvh] shrink-0 border-t border-black/10 lg:h-auto lg:flex-1 lg:border-t-0 lg:border-l dark:border-white/10">
+        <div className="relative h-[50dvh] shrink-0 border-t border-black/10 lg:h-[420px] 2xl:h-auto 2xl:flex-1 2xl:border-t-0 2xl:border-l">
           <BarangayMap
             barangays={list.barangays}
             boundaries={data?.boundaries ?? []}
@@ -455,7 +458,7 @@ function Slider(props: {
         step={step}
         value={Math.min(value, max)}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-1.5 w-full accent-[#0b5d6b]"
+        className="mt-1.5 w-full accent-brand"
         aria-label={label}
       />
       {hint && <p className="text-xs text-zinc-500">{hint}</p>}

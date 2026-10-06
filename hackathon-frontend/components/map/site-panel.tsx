@@ -17,7 +17,7 @@ export function SitePanel({ site, matches, rules, barangayName, onBack }: Props)
 
   return (
     <div>
-      <button onClick={onBack} className="mb-2 text-sm text-[#0b5d6b] hover:underline dark:text-[#7fd1c7]">
+      <button onClick={onBack} className="mb-2 text-sm text-brand hover:underline dark:text-aqua">
         ‹ Back to {barangayName ?? "barangay"}
       </button>
       <p className="text-xs uppercase tracking-wide text-zinc-500">{CATEGORY_LABEL[site.category] ?? site.category}</p>
@@ -35,7 +35,7 @@ export function SitePanel({ site, matches, rules, barangayName, onBack }: Props)
         )}
       </dl>
       {site.tank.days_of_cover != null && (
-        <p className="mt-2 rounded-lg bg-[#0b5d6b]/10 p-3 text-sm">
+        <p className="mt-2 rounded-lg bg-brand/10 p-3 text-sm">
           A full tank keeps this building&apos;s toilets and cleaning running for about <strong>{days(site.tank.days_of_cover)}</strong> in an outage.
         </p>
       )}

@@ -124,14 +124,15 @@ export function StorageScreen() {
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Storage Registry</h1>
+          <p className="text-[10px] font-extrabold tracking-[0.18em] text-brand">DISTRIBUTED RESERVE</p>
+          <h1 className="text-2xl font-extrabold tracking-[-0.03em]">Storage Registry</h1>
           <p className="text-sm text-zinc-500">
             Covered rain storage per barangay against the {target}-day target ({perHouseholdTarget} drums of {drumLiters} L per household). <DataTag status="simulated" />
           </p>
         </div>
         <button
           onClick={() => downloadCsv(visible, data.list.lgu.name)}
-          className="rounded-lg border border-[#0b5d6b]/40 px-3 py-1.5 text-sm font-medium text-[#0b5d6b] hover:bg-[#0b5d6b]/10 dark:text-[#7fd1c7]"
+          className="rounded-lg border border-brand/40 px-3 py-1.5 text-sm font-medium text-brand hover:bg-brand/10 dark:text-aqua"
         >
           ⬇ Export CSV
         </button>

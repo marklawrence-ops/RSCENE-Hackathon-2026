@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "Circular Water Network Planner",
-    short_name: "Water Planner",
+    name: "AGOS · Circular Water Network Planner",
+    short_name: "AGOS",
     description:
       "Plan safe reuse of greywater and rain per barangay, and keep non-potable needs running when the main supply fails.",
     start_url: "/",
@@ -12,7 +12,7 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     orientation: "any",
     background_color: "#ffffff",
-    theme_color: "#0b5d6b",
+    theme_color: "#168d98",
     lang: "en",
     categories: ["utilities", "government"],
     icons: [
