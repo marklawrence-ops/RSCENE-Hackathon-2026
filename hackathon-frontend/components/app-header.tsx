@@ -7,6 +7,7 @@ const NAV = [
   { href: "/designer", label: "Designer" },
   { href: "/storage", label: "Storage" },
   { href: "/form", label: "Form" },
+  { href: "/guide", label: "Guide" },
 ];
 
 export function AppHeader() {
@@ -16,9 +17,9 @@ export function AppHeader() {
         <Image src="/icons/icon-192.png" alt="" width={28} height={28} className="rounded-md" />
         <span className="hidden sm:inline">Water Planner</span>
       </Link>
-      <nav className="flex min-w-0 gap-0.5 overflow-x-auto text-sm sm:gap-1">
+      <nav className="flex min-w-0 gap-0.5 overflow-x-auto text-[13px] [scrollbar-width:none] sm:gap-1 sm:text-sm">
         {NAV.map((item) => (
-          <Link key={item.href} href={item.href} className="shrink-0 rounded-md px-2 py-1.5 hover:bg-zinc-100 sm:px-3 dark:hover:bg-zinc-800">
+          <Link key={item.href} href={item.href} className="shrink-0 rounded-md px-1.5 py-1.5 hover:bg-zinc-100 sm:px-3 dark:hover:bg-zinc-800">
             {item.label}
           </Link>
         ))}

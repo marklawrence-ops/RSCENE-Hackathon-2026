@@ -8,6 +8,7 @@ The concept has six screens, but we build **four routes**: Source-to-Use Matchin
 | `/designer` | 4 Program Designer | 13 (+12 to re-run the outage) | Add 5 tanks + covers → red to green |
 | `/storage` | 5 Storage Registry | 14 | (backup if asked) |
 | `/form` | 6 Barangay Form (offline) | 2, 16 | Airplane mode submit, then sync |
+| `/guide` | Household guide (public, no sign-in; printable card) | none (static; mirrors config/reuse.php) | Answer to "how do households take part?" |
 
 Shared shell: top bar `[logo] Water Planner   [LGU ▾ Catbalogan]   Map · Designer · Storage · Form   [login]`. On a phone the links collapse into a bottom tab bar.
 
@@ -114,3 +115,10 @@ pick one and can mark "Encoding a paper form". Barangay list is cached for offli
 the service worker. Sync runs on load, on the online event, every 30 s, and via "Sync now"; 4xx answers mark the
 item "Not accepted" with a Discard button, 401 asks to sign in again (queued forms are kept).
 Offline flow: Save → write to IndexedDB with `crypto.randomUUID()` → on `online` event (and on load) POST each queued form → remove on 200/201. Re-sending the same `client_uuid` is safe (the API returns 200 with the existing form).
+
+## `/guide`: Household guide
+
+Public, no sign-in, precached for offline. English / Filipino / Waray switch; Filipino and Waray are **draft
+translations** (banner on the page) until a native speaker reviews `components/guide/guide-content.ts`. Sections: Do this
+(source → use), Never, Rules for rain drums (label "Hindi maiinom / Not for drinking" in every language), Be ready when
+the water stops (3 drums ≈ 3 days for a family of 5). "Print card" hides the app chrome.
