@@ -18,6 +18,8 @@ php artisan test --compact
 
 Demo accounts (password = `DEMO_USER_PASSWORD`, default `password`): `planner@demo.test`, `cdrrmo@demo.test`, `barangay@demo.test`.
 
+After rehearsing the Barangay Form, `php artisan demo:reset` deletes forms filed by the demo accounts (seeded and real forms are kept), so the next demo shows the same readiness jump.
+
 ## Loading real buildings and tanks
 
 The seed uses simulated buildings for the demo. To load a real survey (e.g. City Engineering), fill a CSV like `database/data/templates/sites_import_template.csv` and run:
