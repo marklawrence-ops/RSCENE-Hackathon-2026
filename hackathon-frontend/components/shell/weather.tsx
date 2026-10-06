@@ -13,7 +13,8 @@ const URL =
   "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max" +
   "&forecast_days=4&timezone=Asia%2FManila";
 
-const REFRESH_MS = 30 * 60 * 1000;
+// Open-Meteo updates its current reading every 15 minutes.
+const REFRESH_MS = 10 * 60 * 1000;
 // Typical household roof and runoff share (same 0.8 the backend uses for roofs).
 const HOUSEHOLD_ROOF_M2 = 40;
 const RUNOFF = 0.8;
@@ -36,10 +37,10 @@ const label = (code: number) => (CODES.find(([max]) => code <= max) ?? [0, "Weat
 const isWet = (code: number) => code >= 51;
 
 type Day = { date: string; code: number; max: number; min: number; rain: number; chance: number | null };
-type Data = { temp: number; feels: number; humidity: number; code: number; days: Day[]; at: Date };
+type Data = { temp: number; exact: number; feels: number; humidity: number; code: number; days: Day[]; readingAt: string };
 
 type Raw = {
-  current: { temperature_2m: number; apparent_temperature: number; relative_humidity_2m: number; weather_code: number };
+  current: { time: string; temperature_2m: number; apparent_temperature: number; relative_humidity_2m: number; weather_code: number };
   daily: {
     time: string[];
     weather_code: number[];
@@ -54,6 +55,7 @@ function parse(j: Raw): Data {
   const d = j.daily;
   return {
     temp: Math.round(j.current.temperature_2m),
+    exact: j.current.temperature_2m,
     feels: Math.round(j.current.apparent_temperature),
     humidity: Math.round(j.current.relative_humidity_2m),
     code: j.current.weather_code,
@@ -65,12 +67,18 @@ function parse(j: Raw): Data {
       rain: d.precipitation_sum[i] ?? 0,
       chance: d.precipitation_probability_max[i],
     })),
-    at: new Date(),
+    readingAt: j.current.time, // Local Manila time, e.g. 2026-10-06T23:45
   };
 }
 
 const dayName = (date: string, i: number) =>
   i === 0 ? "Today" : i === 1 ? "Tomorrow" : new Date(`${date}T00:00:00+08:00`).toLocaleDateString("en-PH", { weekday: "short", timeZone: "Asia/Manila" });
+
+// "2026-10-06T23:45" (already Manila time) → "11:45 PM".
+function readingTime(local: string) {
+  const [h, m] = local.slice(11, 16).split(":").map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+}
 
 export function Weather() {
   const [data, setData] = useState<Data | null>(null);
@@ -86,11 +94,14 @@ export function Weather() {
         .catch(() => {}); // Offline or blocked: keep the last reading, or show nothing.
     load();
     const id = window.setInterval(load, REFRESH_MS);
+    const onVisible = () => document.visibilityState === "visible" && load();
     window.addEventListener("online", load);
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       cancelled = true;
       window.clearInterval(id);
       window.removeEventListener("online", load);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
@@ -137,7 +148,7 @@ export function Weather() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-[10px] font-extrabold tracking-[0.16em] text-brand">CATBALOGAN NOW</p>
-              <p className="mt-1 text-3xl leading-none font-extrabold tabular-nums">{data.temp}°C</p>
+              <p className="mt-1 text-3xl leading-none font-extrabold tabular-nums">{data.exact.toFixed(1)}°C</p>
               <p className="mt-1 text-xs text-[#5f6869]">
                 {label(data.code)} · feels like {data.feels}°C · humidity {data.humidity}%
               </p>
@@ -181,7 +192,7 @@ export function Weather() {
           )}
 
           <p className="mt-3 text-[10px] text-[#5f6869]">
-            Open-Meteo forecast · updated {data.at.toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Manila" })}
+            Open-Meteo · reading as of {readingTime(data.readingAt)} · refreshes every 10 minutes
           </p>
         </div>
       )}

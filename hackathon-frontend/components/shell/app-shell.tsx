@@ -52,7 +52,7 @@ export function Logo({ light = false }: { light?: boolean }) {
         <Image src="/logo.png" alt="" width={36} height={36} preload />
       </div>
       <div className="leading-none">
-        <strong className={`block text-xl font-extrabold tracking-tight ${light ? "text-white" : "text-foreground"}`}>agos</strong>
+        <strong className={`block text-xl font-extrabold tracking-[0.04em] ${light ? "text-white" : "text-foreground"}`}>AGOS</strong>
         <small className={`mt-1 block text-[9px] font-bold tracking-[0.16em] ${light ? "text-white/80" : "text-brand"}`}>CIRCULAR WATER</small>
       </div>
     </div>

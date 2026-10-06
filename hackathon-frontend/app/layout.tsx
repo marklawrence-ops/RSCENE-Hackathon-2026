@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Manrope } from "next/font/google";
 import { AppShell } from "@/components/shell/app-shell";
-import Script from "next/script";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -32,15 +31,13 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-// Registered by an inline script so it is in the HTML itself (install checkers such as PWABuilder
-// look there), and only in production so dev hot reload is never served from a stale cache.
-const REGISTER_SW = `if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" }).catch(function (err) {
-      console.error("Service worker registration failed", err);
-    });
-  });
-}`;
+// A plain inline <script> in <head>, so the registration call appears verbatim in the HTML
+// (install checkers such as PWABuilder scan for it). Production only, so dev hot reload is
+// never served from a stale cache.
+const REGISTER_SW =
+  "if ('serviceWorker' in navigator) { window.addEventListener('load', function () { " +
+  "navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })" +
+  ".catch(function (err) { console.error('Service worker registration failed', err); }); }); }";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -48,13 +45,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${manrope.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {process.env.NODE_ENV === "production" && <script id="register-sw" dangerouslySetInnerHTML={{ __html: REGISTER_SW }} />}
+      </head>
       <body className="min-h-full flex flex-col">
         <AppShell>{children}</AppShell>
-        {process.env.NODE_ENV === "production" && (
-          <Script id="register-sw" strategy="beforeInteractive">
-            {REGISTER_SW}
-          </Script>
-        )}
       </body>
     </html>
   );
