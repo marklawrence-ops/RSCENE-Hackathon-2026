@@ -2,39 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
-import type { User } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { endpoints } from "@/lib/api";
+import { signOutLocally, useAuthUser } from "@/lib/auth";
 import { Icon, type IconName } from "./icon";
 
-const NAV: { href: string; label: string; icon: IconName }[] = [
+// auth: shown only to signed-in users (the pages themselves also ask for sign-in).
+const NAV: { href: string; label: string; icon: IconName; auth?: boolean }[] = [
   { href: "/", label: "Overview", icon: "grid" },
   // Outage Mode is a toggle on the Reuse Map, not a separate tab.
   { href: "/map", label: "Reuse Map", icon: "map" },
-  { href: "/designer", label: "Program Designer", icon: "sliders" },
-  { href: "/storage", label: "Storage Registry", icon: "storage" },
-  { href: "/form", label: "Barangay Form", icon: "clipboard" },
+  { href: "/designer", label: "Program Designer", icon: "sliders", auth: true },
+  { href: "/storage", label: "Storage Registry", icon: "storage", auth: true },
+  { href: "/form", label: "Barangay Form", icon: "clipboard", auth: true },
   { href: "/guide", label: "Household Guide", icon: "book" },
 ];
 
-const BOTTOM: { href: string; label: string; icon: IconName }[] = [
+const BOTTOM_SIGNED_IN: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Home", icon: "grid" },
   { href: "/map", label: "Map", icon: "map" },
   { href: "/designer", label: "Plan", icon: "sliders" },
   { href: "/form", label: "Form", icon: "clipboard" },
 ];
-
-// Signed-in user saved by the barangay form (localStorage), read without a hydration mismatch.
-function subscribeStorage(cb: () => void) {
-  window.addEventListener("storage", cb);
-  return () => window.removeEventListener("storage", cb);
-}
-function readUser(): string | null {
-  try {
-    return localStorage.getItem("cwnp.user");
-  } catch {
-    return null;
-  }
-}
+const BOTTOM_PUBLIC: { href: string; label: string; icon: IconName }[] = [
+  { href: "/", label: "Home", icon: "grid" },
+  { href: "/map", label: "Map", icon: "map" },
+  { href: "/guide", label: "Guide", icon: "book" },
+  { href: "/login", label: "Sign in", icon: "people" },
+];
 
 export function Logo({ light = false }: { light?: boolean }) {
   return (
@@ -52,8 +47,12 @@ export function Logo({ light = false }: { light?: boolean }) {
 
 function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const rawUser = useSyncExternalStore(subscribeStorage, readUser, () => null);
-  const user = rawUser ? (JSON.parse(rawUser) as User) : null;
+  const user = useAuthUser();
+  const signOut = () => {
+    endpoints.logout().catch(() => {});
+    signOutLocally();
+    onNavigate?.();
+  };
 
   return (
     <div className="flex h-full flex-col px-4 pt-6 pb-4">
@@ -62,7 +61,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
       <p className="mx-3 mt-9 mb-2.5 text-[10px] font-extrabold tracking-[0.18em] text-[#92999a]">PLANNING PORTAL</p>
       <nav className="flex flex-col gap-1">
-        {NAV.map((item) => {
+        {NAV.filter((item) => !item.auth || user).map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (
             <Link
@@ -82,7 +81,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <div className="-mx-4 mt-auto grid grid-cols-[36px_1fr] items-center gap-2.5 border-t border-[#e6e9ea] px-4 pt-4">
+      <div className="-mx-4 mt-auto grid grid-cols-[36px_1fr_auto] items-center gap-2.5 border-t border-[#e6e9ea] px-4 pt-4">
         <div className="grid h-9 w-9 place-items-center rounded-full bg-[#d6a3e5] text-xs font-extrabold text-brand-ink">
           {user ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : <Icon name="people" size={16} />}
         </div>
@@ -91,11 +90,18 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           {user ? (
             <small className="block text-[11px] text-[#7d8789] capitalize">{user.role === "cdrrmo" ? "CDRRMO" : user.role}</small>
           ) : (
-            <Link href="/form" onClick={onNavigate} className="block text-[11px] font-bold text-brand">
-              Sign in to submit forms
-            </Link>
+            <small className="block text-[11px] text-[#7d8789]">Map, scores and guide</small>
           )}
         </div>
+        {user ? (
+          <button onClick={signOut} className="rounded-lg px-2 py-1 text-[11px] font-bold text-[#667072] hover:bg-[#f1f8f8] hover:text-brand">
+            Sign out
+          </button>
+        ) : (
+          <Link href="/login" onClick={onNavigate} className="rounded-full bg-brand px-3 py-1.5 text-[11px] font-extrabold text-white hover:bg-brand-dark">
+            Sign in
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -139,6 +145,8 @@ function Weather() {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const user = useAuthUser();
+  const bottom = user ? BOTTOM_SIGNED_IN : BOTTOM_PUBLIC;
 
   return (
     <div className="flex h-dvh bg-white print:block print:h-auto">
@@ -176,7 +184,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex min-h-0 flex-1 flex-col overflow-y-auto print:overflow-visible">{children}</main>
 
         <nav aria-label="Mobile navigation" className="grid h-16 shrink-0 grid-cols-5 border-t border-[#e1e5e6] bg-white shadow-[0_-2px_7px_rgba(28,56,58,.06)] lg:hidden print:hidden">
-          {BOTTOM.map((item) => {
+          {bottom.map((item) => {
             const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
               <Link key={item.href} href={item.href} className={`flex flex-col items-center justify-center gap-0.5 text-[11px] font-semibold ${active ? "text-brand" : "text-[#616b6d]"}`}>
