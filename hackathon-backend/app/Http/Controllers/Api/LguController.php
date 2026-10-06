@@ -104,6 +104,8 @@ class LguController extends Controller
             'name' => $lgu->name,
             'province' => $lgu->province,
             'center' => ['lat' => $lgu->latitude, 'lng' => $lgu->longitude],
+            // [[south, west], [north, east]] for the map's first view; null = fit all barangays.
+            'default_bounds' => $lgu->settings['default_bounds'] ?? null,
             'is_simulated' => $lgu->is_simulated,
         ];
     }

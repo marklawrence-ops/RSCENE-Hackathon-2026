@@ -25,6 +25,8 @@ export type Lgu = {
   name: string;
   province: string;
   center: LatLng;
+  /** [[south, west], [north, east]] for the map's first view; null = fit all barangays. */
+  default_bounds: [[number, number], [number, number]] | null;
   is_simulated: boolean;
 };
 

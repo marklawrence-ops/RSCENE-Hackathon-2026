@@ -60,6 +60,8 @@ class DatabaseSeeder extends Seeder
             ],
             'tariff_min_charge_php' => 175,
             'rollout_per_year_php' => ['min' => 900000, 'max' => 1700000],
+            // Map opens on the mainland town area (49 of 57 barangays); "Whole city" adds the western islands and Basiao.
+            'default_bounds' => [[11.735, 124.815], [11.91, 124.935]],
             'funding' => [
                 'source' => 'LDRRMF 70% preparedness share (RA 10121)',
                 'preparedness_share_php' => ['min' => 35000000, 'max' => 51000000],

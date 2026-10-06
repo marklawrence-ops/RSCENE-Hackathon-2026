@@ -32,6 +32,8 @@ Shared shell: top bar `[logo] Water Planner   [LGU ▾ Catbalogan]   Map · Desi
 │                                              │  ▲ Mercedes Brgy Hall  ›      │
 │                                              │  △ Mercedes Elem School ›     │
 └──────────────────────────────────────────────┴───────────────────────────────┘
+First view: fit `lgu.default_bounds` (mainland town area, 49 of 57 barangays incl. Bangon). A [Whole city] button
+fits every barangay; the side panel and totals stay citywide either way.
 Outage Mode ON: circles recolour by outcome (holds/partial/fails); a strip shows
 "3 hold · 10 partial · 44 fail"; suggested tank roofs pulse.
 ```

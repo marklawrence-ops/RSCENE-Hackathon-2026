@@ -150,7 +150,9 @@ test('storage registry totals match its rows', function () {
 test('rainfall, scenarios, lgus and reuse rules are public', function () {
     $this->getJson('/api/v1/lgus/catbalogan/rainfall')->assertOk()->assertJsonPath('data_status', 'real');
     $this->getJson('/api/v1/lgus/catbalogan/outage-scenarios')->assertOk()->assertJsonCount(3, 'scenarios');
-    $this->getJson('/api/v1/lgus')->assertOk()->assertJsonPath('lgus.0.slug', 'catbalogan');
+    $this->getJson('/api/v1/lgus')->assertOk()
+        ->assertJsonPath('lgus.0.slug', 'catbalogan')
+        ->assertJsonPath('lgus.0.default_bounds', [[11.735, 124.815], [11.91, 124.935]]);
     $this->getJson('/api/v1/reuse-rules')->assertOk()->assertJsonCount(6, 'rules');
 });
 

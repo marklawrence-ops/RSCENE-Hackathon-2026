@@ -38,7 +38,9 @@ type DataStatus = "real" | "assumed" | "simulated"
 
 type Lgu = {
   id: number; slug: string; name: string; province: string
-  center: LatLng; is_simulated: boolean
+  center: LatLng
+  default_bounds: [[number, number], [number, number]] | null  // v1.1: [[south, west], [north, east]] for the map's first view; null = fit all
+  is_simulated: boolean
 }
 
 type BarangayMetrics = {
@@ -149,7 +151,7 @@ Request `{ "email": "cdrrmo@demo.test", "password": "…", "device_name": "pixel
 
 ### 5. `GET /lgus`
 ```json
-{ "lgus": [ { "id": 1, "slug": "catbalogan", "name": "Catbalogan City", "province": "Samar", "center": { "lat": 11.7753, "lng": 124.8829 }, "is_simulated": false } ] }
+{ "lgus": [ { "id": 1, "slug": "catbalogan", "name": "Catbalogan City", "province": "Samar", "center": { "lat": 11.7753, "lng": 124.8829 }, "default_bounds": [[11.735, 124.815], [11.91, 124.935]], "is_simulated": false } ] }
 ```
 
 ### 6. `GET /lgus/{lgu}/barangays`
@@ -269,5 +271,6 @@ Request (all required except `notes`):
 **v1.1 (2026-10-06, afternoon).** Additive only; nothing removed or renamed.
 - `Site.nonpotable_demand_lpd` and `Site.tank.days_of_cover`, so public buildings can show their own cover separately from household drums.
 - `program-preview` → each `barangays[]` row also has `greywater_reused_lpd_before` / `greywater_reused_lpd_after` (effect of the adoption slider).
+- `Lgu.default_bounds`: the map opens on the mainland town area (49 of 57 barangays). A "Whole city" button fits all barangays. All data and totals stay citywide.
 - Outage days of cover now scale with the scenario's `supply_loss` (see #12).
 - Seed: the "turbid-power-cut" scenario lasts 3 days (matches the 3-day target). Demo barangay: **Bangon** (id 3), red → green with 5 tanks + 80 drum covers.

@@ -39,6 +39,7 @@ export const MOCK_LGU: Lgu = {
   name: "Catbalogan City",
   province: "Samar",
   center: { lat: 11.7753, lng: 124.8829 },
+  default_bounds: [[11.735, 124.815], [11.91, 124.935]],
   is_simulated: false,
 };
 
