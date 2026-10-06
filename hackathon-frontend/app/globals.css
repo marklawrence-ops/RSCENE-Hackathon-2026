@@ -13,14 +13,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-manrope), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-  --color-brand: #168d98;
-  --color-brand-dark: #10747c;
+  --color-brand: #117580;
+  --color-brand-dark: #0d5f68;
   --color-brand-ink: #173d42;
   --color-brand-soft: #eaf8f9;
   --color-aqua: #53d3df;
   --color-line: #e2e6e7;
   --color-surface-2: #f2f5f6;
-  --color-muted: #737c7e;
+  --color-muted: #626b6d;
   --color-violet: #b878cf;
 }
 

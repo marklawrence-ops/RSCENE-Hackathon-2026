@@ -77,7 +77,7 @@ export function LoginCard({
         <div className="px-6 py-8 sm:px-10 sm:py-10">
           <span className="text-[10px] font-extrabold tracking-[0.17em] text-brand">{eyebrow}</span>
           <h1 className="mt-2 text-3xl leading-tight font-extrabold tracking-[-0.04em]">Welcome back</h1>
-          <p className="mt-1.5 text-sm text-[#7a8486]">{intro}</p>
+          <p className="mt-1.5 text-sm text-[#5f6869]">{intro}</p>
           {notice && <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{notice.text}</p>}
           <form onSubmit={submit} className="mt-6 space-y-4">
             <label className="block text-xs font-bold text-[#424b4d]">
@@ -125,7 +125,7 @@ export function LoginCard({
           </form>
           <div className="mt-6 flex gap-2.5 rounded-xl bg-[#eff7f7] p-3 text-brand">
             <Icon name="book" size={18} className="mt-0.5 shrink-0" />
-            <p className="text-xs leading-relaxed text-[#768183]">
+            <p className="text-xs leading-relaxed text-[#5f6869]">
               <strong className="text-[#3c666a]">Need access?</strong> Accounts are given by the City ICT office. Households don&apos;t need an account: see the{" "}
               <Link href="/guide" className="font-bold text-brand underline">
                 Household guide

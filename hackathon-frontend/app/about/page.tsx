@@ -64,7 +64,7 @@ function CreditList({ items }: { items: Credit[] }) {
             )}
             <p className="mt-0.5 text-[#5f6869]">{c.what}</p>
           </div>
-          {c.licence && <span className="shrink-0 rounded-full bg-[#eaf7f8] px-2 py-0.5 text-[11px] font-bold text-[#137e88]">{c.licence}</span>}
+          {c.licence && <span className="shrink-0 rounded-full bg-[#eaf7f8] px-2 py-0.5 text-[11px] font-bold text-[#0f6a73]">{c.licence}</span>}
         </li>
       ))}
     </ul>
@@ -129,7 +129,7 @@ export default function AboutPage() {
         <CreditList items={SOFTWARE} />
       </Section>
 
-      <p className="mt-7 text-xs text-[#7d8789]">Hosted on Vercel (app) and Laravel Cloud (API). Map data © OpenStreetMap contributors.</p>
+      <p className="mt-7 text-xs text-[#5f6869]">Hosted on Vercel (app) and Laravel Cloud (API). Map data © OpenStreetMap contributors.</p>
     </div>
   );
 }

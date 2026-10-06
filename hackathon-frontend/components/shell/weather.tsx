@@ -161,7 +161,7 @@ export function Weather() {
           </ul>
 
           <div className="mt-3 rounded-xl bg-[#eaf7f8] px-3 py-2.5 text-xs leading-snug">
-            <p className="font-extrabold text-[#137e88]">Rain to catch</p>
+            <p className="font-extrabold text-[#0f6a73]">Rain to catch</p>
             <p className="mt-0.5 text-[#44514f]">
               About <strong>{Math.round(totalRain)} mm</strong> expected in 4 days. A {HOUSEHOLD_ROOF_M2} m² roof could fill about{" "}
               <strong>{num(roofLiters)} L</strong>, or {Math.floor(roofLiters / 200)} covered 200 L drums.
@@ -180,7 +180,7 @@ export function Weather() {
             </div>
           )}
 
-          <p className="mt-3 text-[10px] text-[#7d8789]">
+          <p className="mt-3 text-[10px] text-[#5f6869]">
             Open-Meteo forecast · updated {data.at.toLocaleTimeString("en-PH", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Manila" })}
           </p>
         </div>

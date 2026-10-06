@@ -73,7 +73,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       <Link href="/" onClick={onNavigate} className="px-1">
         <Logo />
       </Link>
-      <p className="mx-3 mt-9 mb-2.5 text-[10px] font-extrabold tracking-[0.18em] text-[#92999a]">PLANNING PORTAL</p>
+      <p className="mx-3 mt-9 mb-2.5 text-[10px] font-extrabold tracking-[0.18em] text-[#6b7475]">PLANNING PORTAL</p>
       <nav className="flex flex-col gap-1">
         {NAV.filter((item) => !item.auth || user).map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -84,7 +84,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
-                active ? "bg-[#eaf7f8] text-[#137e88]" : "text-[#667072] hover:bg-[#f1f8f8] hover:text-[#177f88]"
+                active ? "bg-[#eaf7f8] text-[#0f6a73]" : "text-[#667072] hover:bg-[#f1f8f8] hover:text-[#177f88]"
               }`}
             >
               <Icon name={item.icon} className={active ? "text-brand" : ""} />
@@ -102,9 +102,9 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         <div className="min-w-0">
           <strong className="block truncate text-xs">{user ? user.name : "Public view"}</strong>
           {user ? (
-            <small className="block text-[11px] text-[#7d8789] capitalize">{user.role === "cdrrmo" ? "CDRRMO" : user.role}</small>
+            <small className="block text-[11px] text-[#5f6869] capitalize">{user.role === "cdrrmo" ? "CDRRMO" : user.role}</small>
           ) : (
-            <small className="block text-[11px] text-[#7d8789]">Map, scores and guide</small>
+            <small className="block text-[11px] text-[#5f6869]">Map, scores and guide</small>
           )}
         </div>
         {user ? (

@@ -23,9 +23,9 @@ const NO_SUGGESTIONS = new Set<number>();
 type Tone = "cyan" | "violet" | "green" | "amber";
 const TONE: Record<Tone, { icon: string; badge: string }> = {
   cyan: { icon: "bg-brand-soft text-brand", badge: "bg-[#dff5f6] text-[#117c85]" },
-  violet: { icon: "bg-[#f6ecf9] text-[#aa65c1]", badge: "bg-[#f2e4f7] text-[#9555aa]" },
-  green: { icon: "bg-[#edf7ee] text-[#4b9f5a]", badge: "bg-[#dff2d8] text-[#428e3c]" },
-  amber: { icon: "bg-[#faf1e3] text-[#bd7d29]", badge: "bg-[#f9ecd7] text-[#a96b1d]" },
+  violet: { icon: "bg-[#f6ecf9] text-[#aa65c1]", badge: "bg-[#f2e4f7] text-[#7a3f8f]" },
+  green: { icon: "bg-[#edf7ee] text-[#4b9f5a]", badge: "bg-[#dff2d8] text-[#2f6e2a]" },
+  amber: { icon: "bg-[#faf1e3] text-[#bd7d29]", badge: "bg-[#f9ecd7] text-[#7f5214]" },
 };
 
 function quarterLabel() {
@@ -275,7 +275,7 @@ export function OverviewScreen() {
                 <span className="min-w-0 flex-1">
                   <span className={`inline-block rounded-xl px-2 py-0.5 text-[10px] font-extrabold tracking-wider ${TONE[a.tone].badge}`}>{a.tag}</span>
                   <strong className="mt-1 block text-sm leading-snug">{a.title}</strong>
-                  <span className="mt-0.5 block text-xs leading-relaxed text-[#7b8587]">{a.detail}</span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-[#5f6869]">{a.detail}</span>
                 </span>
                 <Icon name="chevron" className="mt-3 shrink-0 text-[#9aa3a4]" />
               </Link>
@@ -284,7 +284,7 @@ export function OverviewScreen() {
           {!user && (
             <div className="mt-3 rounded-2xl bg-[#eff7f7] p-4">
               <strong className="block text-sm">Planning tools for LGU and barangay staff</strong>
-              <p className="mt-1 text-xs leading-relaxed text-[#6e7c7e]">
+              <p className="mt-1 text-xs leading-relaxed text-[#5f6869]">
                 The Program Designer, Storage Registry and Barangay Form open after sign-in. Households don&apos;t need an account.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -322,9 +322,9 @@ function StatCard({ icon, tone, label, value, detail }: { icon: IconName; tone: 
         <Icon name={icon} />
       </span>
       <div className="min-w-0">
-        <span className="block text-xs leading-snug font-bold text-[#7a8486]">{label}</span>
+        <span className="block text-xs leading-snug font-bold text-[#5f6869]">{label}</span>
         <strong className="my-0.5 block truncate text-xl font-extrabold tabular-nums">{value}</strong>
-        <small className="block text-[11px] leading-snug text-[#7a8486]">{detail}</small>
+        <small className="block text-[11px] leading-snug text-[#5f6869]">{detail}</small>
       </div>
     </article>
   );
