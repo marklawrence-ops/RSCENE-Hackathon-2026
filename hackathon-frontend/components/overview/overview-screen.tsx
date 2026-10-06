@@ -135,13 +135,7 @@ export function OverviewScreen() {
           </p>
           <div className="mt-6 flex flex-wrap gap-2.5">
             <Link href="/map" className="inline-flex min-h-10 items-center gap-2 rounded-full bg-brand px-5 text-sm font-extrabold text-white transition hover:-translate-y-px hover:bg-brand-dark">
-              <Icon name="map" size={17} /> Explore network
-            </Link>
-            <Link
-              href="/map?outage=1"
-              className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#cbd2d3] bg-white px-5 text-sm font-extrabold transition hover:-translate-y-px"
-            >
-              <Icon name="storm" size={17} /> Run outage mode
+              <Icon name="map" size={17} /> Open Reuse Map
             </Link>
           </div>
         </div>
@@ -173,7 +167,7 @@ export function OverviewScreen() {
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.65fr)_minmax(280px,.75fr)]">
         <div>
           <SectionTitle
-            eyebrow="REUSE NETWORK"
+            eyebrow="REUSE MAP"
             title="Readiness across the city"
             aside={
               <Link href="/map" className="flex items-center gap-1 text-sm font-extrabold text-brand">
@@ -185,7 +179,7 @@ export function OverviewScreen() {
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
               <div className="flex items-center gap-2.5">
                 <span className={`rounded-xl px-2 py-0.5 text-[10px] font-extrabold tracking-wider ${TONE.green.badge}`}>LIVE PLANNING VIEW</span>
-                <strong className="text-sm">{data?.list.lgu.name ?? "…"} reuse network</strong>
+                <strong className="text-sm">{data?.list.lgu.name ?? "…"} reuse map</strong>
               </div>
               <div className="flex gap-3 text-xs text-muted">
                 {(["green", "amber", "red"] as const).map((s) => (

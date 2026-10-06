@@ -36,9 +36,9 @@ export function MapScreen() {
   const [site, setSite] = useState<Site | null>(null);
   const [matches, setMatches] = useState<SiteMatches | null>(null);
 
-  // /map?outage=1 (the "Outage Mode" link) opens with the simulation on.
+  // /map?outage=1 opens with Outage Mode on (handy for the demo and shared links).
   const [outageOn, setOutageOn] = useState(() => isOutageParam(searchParams));
-  // Clicking "Outage Mode" while already on the map switches it on too.
+  // Following such a link while already on the map switches it on too.
   const outageParam = isOutageParam(searchParams);
   const [seenOutageParam, setSeenOutageParam] = useState(outageParam);
   if (outageParam !== seenOutageParam) {

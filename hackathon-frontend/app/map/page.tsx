@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { MapScreen } from "@/components/map/map-screen";
 
-export const metadata = { title: "Reuse Network · AGOS" };
+export const metadata = { title: "Reuse Map · AGOS" };
 
 export default function MapPage() {
   // Suspense: the map reads ?outage=1 from the URL.

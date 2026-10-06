@@ -11,7 +11,7 @@ The concept has six screens, but we build **four routes**: Source-to-Use Matchin
 | `/form` | 6 Barangay Form (offline) | 2, 16 | Airplane mode submit, then sync |
 | `/guide` | Household guide (public, no sign-in; printable card) | none (static; mirrors config/reuse.php) | Answer to "how do households take part?" |
 
-Shared shell (AGOS design, Oct 6 evening): left sidebar on desktop, aqua top bar with active LGU and live Open-Meteo weather,
+Shared shell (AGOS design, Oct 6 evening; nav: Overview, Reuse Map (Outage Mode is its toggle), Program Designer, Storage Registry, Barangay Form, Household Guide): left sidebar on desktop, aqua top bar with active LGU and live Open-Meteo weather,
 bottom tab bar + drawer on phones; Manrope; light theme only. Previous shell: top bar `[logo] Water Planner   [LGU ▾ Catbalogan]   Map · Designer · Storage · Form   [login]`. On a phone the links collapse into a bottom tab bar.
 
 ## `/map`: Reuse Network Map

@@ -6,10 +6,10 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import type { User } from "@/lib/types";
 import { Icon, type IconName } from "./icon";
 
-const NAV: { href: string; label: string; icon: IconName; match?: string }[] = [
+const NAV: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Overview", icon: "grid" },
-  { href: "/map", label: "Reuse Network", icon: "map" },
-  { href: "/map?outage=1", label: "Outage Mode", icon: "storm", match: "never" },
+  // Outage Mode is a toggle on the Reuse Map, not a separate tab.
+  { href: "/map", label: "Reuse Map", icon: "map" },
   { href: "/designer", label: "Program Designer", icon: "sliders" },
   { href: "/storage", label: "Storage Registry", icon: "storage" },
   { href: "/form", label: "Barangay Form", icon: "clipboard" },
@@ -18,7 +18,7 @@ const NAV: { href: string; label: string; icon: IconName; match?: string }[] = [
 
 const BOTTOM: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Home", icon: "grid" },
-  { href: "/map", label: "Network", icon: "map" },
+  { href: "/map", label: "Map", icon: "map" },
   { href: "/designer", label: "Plan", icon: "sliders" },
   { href: "/form", label: "Form", icon: "clipboard" },
 ];
@@ -63,7 +63,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       <p className="mx-3 mt-9 mb-2.5 text-[10px] font-extrabold tracking-[0.18em] text-[#92999a]">PLANNING PORTAL</p>
       <nav className="flex flex-col gap-1">
         {NAV.map((item) => {
-          const active = item.match !== "never" && (item.href === "/" ? pathname === "/" : pathname.startsWith(item.href));
+          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (
             <Link
               key={item.href}
@@ -82,18 +82,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <div className="mt-auto rounded-2xl bg-[#f0f4f5] p-4">
-        <span className="mb-2.5 grid h-8 w-8 place-items-center rounded-lg bg-white text-brand">
-          <Icon name="book" size={18} />
-        </span>
-        <strong className="block text-sm">Safety guidance</strong>
-        <p className="mt-1 mb-2.5 text-xs leading-relaxed text-[#7d8789]">Non-potable reuse rules for households and field teams.</p>
-        <Link href="/guide" onClick={onNavigate} className="flex items-center gap-1 text-xs font-extrabold text-brand">
-          Open guide <Icon name="chevron" size={13} />
-        </Link>
-      </div>
-
-      <div className="-mx-4 mt-4 grid grid-cols-[36px_1fr] items-center gap-2.5 border-t border-[#e6e9ea] px-4 pt-4">
+      <div className="-mx-4 mt-auto grid grid-cols-[36px_1fr] items-center gap-2.5 border-t border-[#e6e9ea] px-4 pt-4">
         <div className="grid h-9 w-9 place-items-center rounded-full bg-[#d6a3e5] text-xs font-extrabold text-brand-ink">
           {user ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : <Icon name="people" size={16} />}
         </div>
