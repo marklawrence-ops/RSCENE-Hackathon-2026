@@ -23,15 +23,6 @@ export const STATUS: Record<Status, { color: string; label: string }> = {
   red: { color: "#dc2626", label: "Under 1 day" },
 };
 
-// Normal map: share of light greywater households already reuse (teal, light → dark).
-export const ADOPTION_STEPS = [
-  { max: 0.05, color: "#9fd8cf", label: "Under 5% reused" },
-  { max: 0.1, color: "#2a9d8f", label: "5–10% reused" },
-  { max: Infinity, color: "#0b5d6b", label: "10%+ reused" },
-];
-
-export const adoptionColor = (rate: number) => ADOPTION_STEPS.find((s) => rate < s.max)!.color;
-
 export const OUTCOME: Record<"holds" | "partial" | "fails", { status: Status; label: string }> = {
   holds: { status: "green", label: "Holds out" },
   partial: { status: "amber", label: "Partly" },

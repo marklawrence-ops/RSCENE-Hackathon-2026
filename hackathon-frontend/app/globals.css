@@ -32,15 +32,11 @@ body {
     fill-opacity 0.25s ease;
 }
 .barangay-shape:hover {
-  fill-opacity: 0.85;
+  fill-opacity: 0.7;
 }
 .leaflet-container {
   font-family: inherit;
   background: #e8eef0;
-}
-/* Muted basemap so the barangay colours carry the meaning. */
-.leaflet-tile-pane {
-  filter: grayscale(0.85) brightness(1.04) contrast(0.92);
 }
 .leaflet-control-attribution {
   font-size: 10px;

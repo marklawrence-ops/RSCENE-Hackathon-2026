@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { endpoints } from "@/lib/api";
-import { ADOPTION_STEPS, adoptionColor, days, liters, num, OUTCOME, STATUS } from "@/lib/format";
+import { days, liters, num, OUTCOME, STATUS } from "@/lib/format";
 import type { BarangayDetail, BarangayList, BarangaySummary, BoundaryFeature, OutageRun, OutageScenario, ReuseRules, Site, SiteMatches } from "@/lib/types";
 import type { MapView } from "./barangay-map";
 import { BarangayPanel } from "./barangay-panel";
@@ -117,10 +117,9 @@ export function MapScreen() {
   const outageById = useMemo(() => new Map(run?.results.map((r) => [r.barangay_id, r]) ?? []), [run]);
   const showOutage = outageOn && run !== null;
 
-  // Normal map leads with reuse (teal); Outage Mode switches to red / amber / green.
+  // Normal map: days of stored water. Outage Mode: whether each barangay holds out.
   const colorFor = useCallback(
-    (b: BarangaySummary) =>
-      showOutage ? STATUS[outageById.get(b.id)?.status ?? "green"].color : adoptionColor(b.metrics.adoption_rate),
+    (b: BarangaySummary) => STATUS[showOutage ? (outageById.get(b.id)?.status ?? "green") : b.metrics.status].color,
     [showOutage, outageById],
   );
 
@@ -208,11 +207,11 @@ export function MapScreen() {
 
         {/* Legend + view switch */}
         <div className="absolute bottom-6 left-3 z-[1000] rounded-xl bg-white/95 p-2 text-xs shadow-md sm:p-3 dark:bg-zinc-900/95">
-          <p className="mb-1.5 hidden font-semibold sm:block">{showOutage ? `${scenario?.name ?? "Outage"}` : "Greywater reused today"}</p>
+          <p className="mb-1.5 hidden font-semibold sm:block">{showOutage ? `${scenario?.name ?? "Outage"}` : "Days of stored water"}</p>
           <ul className="flex gap-3 sm:block sm:space-y-1">
             {(showOutage
               ? (["holds", "partial", "fails"] as const).map((o) => ({ color: STATUS[OUTCOME[o].status].color, label: OUTCOME[o].label }))
-              : ADOPTION_STEPS.map((s) => ({ color: s.color, label: s.label }))
+              : (["green", "amber", "red"] as const).map((s) => ({ color: STATUS[s].color, label: STATUS[s].label }))
             ).map((row) => (
               <li key={row.label} className="flex items-center gap-2">
                 <span className="h-3 w-3 rounded-full" style={{ backgroundColor: row.color }} />

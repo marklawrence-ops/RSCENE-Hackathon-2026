@@ -138,9 +138,10 @@ export default function BarangayMap(props: Props) {
         const selected = b.id === selectedId;
         const style = {
           color: "#ffffff",
-          weight: 1,
+          weight: 1.5,
           fillColor: color,
-          fillOpacity: selected ? 0.85 : 0.6,
+          // See-through enough that street and place labels stay readable.
+          fillOpacity: selected ? 0.7 : 0.45,
         };
         const shape = shapes.get(b.id);
         const handlers = { click: () => onSelect(b.id) };
