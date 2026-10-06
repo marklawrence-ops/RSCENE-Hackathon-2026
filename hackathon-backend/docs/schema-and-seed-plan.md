@@ -44,16 +44,18 @@ lgus 1─┬─* barangays 1─┬─* sites
 |---|---|---|---|---|
 | 1 | Catbalogan LGU + settings (90.09 L, usage split, runoff 0.8, drum 200 L, costs, tariff, LDRRMF) | real / assumed | Concept doc | Yes |
 | 2 | 57 barangays, 2020 population (sum 106,440) | real | PSA via PhilAtlas, `database/data/catbalogan_barangays.csv` | Yes |
-| 3 | Barangay coordinates (centroids) | real | OpenStreetMap / PhilAtlas per-barangay pages → fill `latitude,longitude` in the CSV | **Phase 3, backend** |
+| 3 | Barangay coordinates (centroids) | real | OpenStreetMap (Nominatim), all 57 in the CSV | Yes |
 | 4 | `outage_vulnerability` | simulated | Stable hash of name (coastal/upland override later if time) | Yes |
 | 5 | 3 outage scenarios (turbid + power cut, dry season, typhoon) | simulated | July 2026 event | Yes |
 | 6 | Demo users: planner@, cdrrmo@, barangay@demo.test (password from `DEMO_USER_PASSWORD`) | – | – | Yes |
-| 7 | Public-building sites: ~2 per barangay (school, barangay hall), + health centers and the city gym/market; roofs 80–400 m²; 3–5 installed tanks citywide, rest `candidate` | simulated | Real building types; positions jittered around the barangay centroid | **Phase 3** |
-| 8 | Businesses: ~15 (laundromats, carwashes, hotels) in Poblacion barangays | simulated | Real business types, simulated volumes | **Phase 3** |
-| 9 | One past form per barangay (period `2026-Q3`): drums 5–20% of households, adoption 2–15% | simulated | – | **Phase 3** |
-| 10 | Monthly rainfall, last 24 months | real | Open-Meteo archive API, `php artisan rainfall:sync`; fallback rows from annual 2,991 mm split evenly, `source=seed` | **Phase 3** |
+| 7 | Public-building sites: ~2 per barangay (school, barangay hall), + health centers and the city gym/market; roofs 80–400 m²; 3–5 installed tanks citywide, rest `candidate` | simulated | `DemoDataSeeder`: hall + school per barangay, health center if pop ≥ 3,000; 5 installed tanks (1 not working) | Yes |
+| 8 | Businesses: ~15 (laundromats, carwashes, hotels) in Poblacion barangays | simulated | `DemoDataSeeder`: 18, one per town barangay | Yes |
+| 9 | One past form per barangay (period `2026-Q3`): drums 5–20% of households, adoption 2–15% | simulated | `DemoDataSeeder` | Yes |
+| 10 | Monthly rainfall, last 24 months | real | Open-Meteo archive API, `php artisan rainfall:sync`; seeded from `database/data/catbalogan_rainfall.csv` (Oct 2024–Sep 2026) | Yes |
 | 11 | Second LGU (small municipality, all `is_simulated`) | simulated | For the scalability demo | Stretch |
 
 Demo story the seed must support: a barangay starts **red**; adding 5 tanks + drum covers in the Program Designer moves it to **amber/green**.
 
-> **Math check (decide by 5:30 PM):** with the concept-doc formula, days of cover = storage ÷ (population × 34 L). Five 1,000 L tanks are 5,000 L. That is 0.01 days for Mercedes (12,281 people, 420,000 L/day) and still only ~0.5 days for the smallest barangay (Manguehay, 135 people, 4,600 L/day). **Tanks alone can never turn a barangay green; covered drums do the work** (3 drums per household = 3 days). Options: (a) demo on a small upland barangay and let the drum covers + adoption slider carry it; (b) show public-building tanks as their own metric ("days the school's toilets keep running"), separate from household drum cover; (c) both. Recommendation: (c), and pick the demo barangay from the seeded numbers.
+> **Resolved:** demo on **Bangon** (272 people, 0.8 days, red): 5 tanks + 80 drum covers → 3.0 days, green, Php 113k–182k. Installed tanks also show their own `tank.days_of_cover`.
+>
+> **Math check (original note):** with the concept-doc formula, days of cover = storage ÷ (population × 34 L). Five 1,000 L tanks are 5,000 L. That is 0.01 days for Mercedes (12,281 people, 420,000 L/day) and still only ~0.5 days for the smallest barangay (Manguehay, 135 people, 4,600 L/day). **Tanks alone can never turn a barangay green; covered drums do the work** (3 drums per household = 3 days). Options: (a) demo on a small upland barangay and let the drum covers + adoption slider carry it; (b) show public-building tanks as their own metric ("days the school's toilets keep running"), separate from household drum cover; (c) both. Recommendation: (c), and pick the demo barangay from the seeded numbers.

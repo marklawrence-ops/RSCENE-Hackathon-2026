@@ -3,10 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $lgu_id
+ * @property string $name
+ * @property int $population
+ * @property int $population_year
+ * @property int|null $households
+ * @property float|null $latitude
+ * @property float|null $longitude
+ * @property float $outage_vulnerability
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Lgu $lgu
+ * @property-read Collection<int, Site> $sites
+ * @property-read BarangayForm|null $latestForm
+ */
 #[Fillable(['lgu_id', 'name', 'population', 'population_year', 'households', 'latitude', 'longitude', 'outage_vulnerability'])]
 class Barangay extends Model
 {
@@ -44,5 +63,13 @@ class Barangay extends Model
     public function forms(): HasMany
     {
         return $this->hasMany(BarangayForm::class);
+    }
+
+    /**
+     * @return HasOne<BarangayForm, $this>
+     */
+    public function latestForm(): HasOne
+    {
+        return $this->hasOne(BarangayForm::class)->latestOfMany('submitted_at');
     }
 }

@@ -126,10 +126,11 @@ const SITES: Site[] = RAW.flatMap((r) => {
     source_types: ["rain", "light_greywater"],
     greywater_lpd: Math.round(200 + rand(r.name + k + "g") * 600),
     rain_yield_lpd: Math.round((2991 * roof(k) * 0.8) / 365),
+    nonpotable_demand_lpd: Math.round(150 + rand(r.name + k + "n") * 600),
     tank:
       n === 1 && r.tankLiters
-        ? { status: "installed", liters: 1000, covered: true, working: true }
-        : { status: "candidate", liters: null, covered: null, working: null },
+        ? { status: "installed", liters: 1000, covered: true, working: true, days_of_cover: 2.5 }
+        : { status: "candidate", liters: null, covered: null, working: null, days_of_cover: null },
     data_status: "simulated",
   });
   const list = [site(1, `${r.name} Barangay Hall`, "barangay_hall", "h"), site(2, `${r.name} Elementary School`, "school", "s")];
@@ -138,14 +139,14 @@ const SITES: Site[] = RAW.flatMap((r) => {
       ...site(3, `${r.name} Laundromat`, "laundromat", "b"),
       kind: "business",
       source_types: ["wash_water", "condensate"],
-      tank: { status: "none", liters: null, covered: null, working: null },
+      tank: { status: "none", liters: null, covered: null, working: null, days_of_cover: null },
     });
   }
   return list;
 });
 
 const SCENARIOS: OutageScenario[] = [
-  { id: 1, slug: "turbid-power-cut", name: "Turbid source + power cut", description: "The July 2026 case: heavy rain makes the main source too turbid to treat and a power-line outage stops pumping.", duration_days: 5, supply_loss: 0.9 },
+  { id: 1, slug: "turbid-power-cut", name: "Turbid source + power cut", description: "The July 2026 case: heavy rain makes the main source too turbid to treat and a power-line outage stops pumping.", duration_days: 3, supply_loss: 0.9 },
   { id: 2, slug: "dry-season", name: "Dry-season spring drawdown", description: "Springs run low after dry months; rationing cuts piped supply by about half.", duration_days: 14, supply_loss: 0.5 },
   { id: 3, slug: "typhoon", name: "Typhoon landfall", description: "Pipes and power lines damaged citywide for several days.", duration_days: 3, supply_loss: 1.0 },
 ];
@@ -199,7 +200,15 @@ function programPreview(input: ProgramInput): ProgramPreview {
   const rows = targets.map((r) => {
     const before = summarize(r).metrics;
     const after = summarize(r, perBarangayExtra).metrics;
-    return { id: r.id, days_before: before.days_of_cover, days_after: after.days_of_cover, status_before: before.status, status_after: after.status };
+    return {
+      id: r.id,
+      days_before: before.days_of_cover,
+      days_after: after.days_of_cover,
+      status_before: before.status,
+      status_after: after.status,
+      greywater_reused_lpd_before: before.greywater_lpd - before.reuse_gap_lpd,
+      greywater_reused_lpd_after: Math.round(before.greywater_lpd * input.adoption_rate),
+    };
   });
   const cost = {
     min: tanks * COST.tank.min + input.drum_covers * COST.cover.min + input.cards * COST.card + COST.training,

@@ -1,6 +1,6 @@
 # API Contract: Circular Water Network Planner
 
-Version 1, agreed 2026-10-06, 12:00 NN. **Change it only by editing this file, and tell the other side when you do.**
+Version 1.1 (2026-10-06 afternoon; v1 agreed 12:00 NN). v1.1 only adds fields, see the changelog at the end. **Change it only by editing this file, and tell the other side when you do.**
 The frontend builds against mocks with the same shapes (`hackathon-frontend/lib/mocks.ts`, types in `lib/types.ts`), so keep the two in step.
 
 ## Conventions
@@ -64,7 +64,10 @@ type BarangaySummary = {
   metrics: BarangayMetrics
 }
 
-type Tank = { status: "none" | "candidate" | "installed"; liters: number | null; covered: boolean | null; working: boolean | null }
+type Tank = {
+  status: "none" | "candidate" | "installed"; liters: number | null; covered: boolean | null; working: boolean | null
+  days_of_cover: number | null    // v1.1: installed tank ÷ the building's own non-potable use ("toilets keep running N days")
+}
 
 type Site = {
   id: number; barangay_id: number; name: string
@@ -74,7 +77,8 @@ type Site = {
   roof_area_m2: number | null
   source_types: SourceKey[]
   greywater_lpd: number | null
-  rain_yield_lpd: number | null    // annual_rainfall × roof × runoff ÷ 365
+  rain_yield_lpd: number | null    // last 12 months of Open-Meteo rain × roof × 0.8 ÷ 365
+  nonpotable_demand_lpd: number | null  // v1.1: the building's own flushing and cleaning use
   tank: Tank
   data_status: DataStatus
 }
@@ -126,7 +130,7 @@ type ProgramInput = {
 | 16 | `POST /barangay-forms` | token | Barangay Form (offline sync) |
 | 17 | `GET /lgus/{lgu}/rainfall` | – | Detail panel, Designer |
 
-Status today: 1–4 live. Everything else returns from the frontend mocks until the backend lands it.
+Status: **all 17 live** (2026-10-06). Covered by `tests/Feature/WaterModelApiTest.php`.
 
 ### 1. `GET /health`
 ```json
@@ -214,7 +218,7 @@ Request `{ "scenario": "turbid-power-cut", "program": ProgramInput | null }`. No
   "summary": { "holds": 3, "partial": 10, "fails": 44 }
 }
 ```
-`outcome`: `holds` (cover ≥ scenario days), `partial` (≥ 1 day), `fails`. `suggested_site_id` = candidate roof where a new tank adds the most cover, or `null`.
+Days of cover here = storage ÷ (non-potable demand × `supply_loss`), because storage only replaces the piped water that is lost. `outcome`: `holds` (cover ≥ scenario days, or barangay not affected), `partial` (≥ 1 day), `fails`. `suggested_site_id` = candidate roof where a new tank adds the most cover, or `null`.
 
 ### 13. `POST /lgus/{lgu}/program-preview`
 Request `ProgramInput`. Nothing is saved.
@@ -259,3 +263,11 @@ Request (all required except `notes`):
 ```json
 { "months": [ { "year": 2025, "month": 7, "rainfall_mm": 303.0, "source": "open-meteo" } ], "annual_mm": 2991, "data_status": "real" }
 ```
+
+## Changelog
+
+**v1.1 (2026-10-06, afternoon).** Additive only; nothing removed or renamed.
+- `Site.nonpotable_demand_lpd` and `Site.tank.days_of_cover`, so public buildings can show their own cover separately from household drums.
+- `program-preview` → each `barangays[]` row also has `greywater_reused_lpd_before` / `greywater_reused_lpd_after` (effect of the adoption slider).
+- Outage days of cover now scale with the scenario's `supply_loss` (see #12).
+- Seed: the "turbid-power-cut" scenario lasts 3 days (matches the 3-day target). Demo barangay: **Bangon** (id 3), red → green with 5 tanks + 80 drum covers.

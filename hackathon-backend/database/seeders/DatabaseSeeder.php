@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Barangay;
 use App\Models\Lgu;
 use App\Models\OutageScenario;
+use App\Models\RainfallMonthly;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -14,8 +15,8 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
-     * Seed plan: docs/seed-plan.md. Real data first (LGU, PSA barangays), then scenarios and demo users.
-     * Simulated sites, forms and rainfall are added by the backend in Phase 3.
+     * Seed plan: docs/schema-and-seed-plan.md. Real data first (LGU, PSA barangays, Open-Meteo rainfall),
+     * then scenarios, demo users and the simulated sites and forms.
      */
     public function run(): void
     {
@@ -29,8 +30,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->seedBarangays($lgu, database_path('data/catbalogan_barangays.csv'), 2020);
+        $this->seedRainfall($lgu, database_path('data/catbalogan_rainfall.csv'));
         $this->seedOutageScenarios($lgu);
         $this->seedDemoUsers($lgu);
+
+        $this->call(DemoDataSeeder::class);
     }
 
     /**
@@ -55,6 +59,7 @@ class DatabaseSeeder extends Seeder
                 'training_session' => 15000,
             ],
             'tariff_min_charge_php' => 175,
+            'rollout_per_year_php' => ['min' => 900000, 'max' => 1700000],
             'funding' => [
                 'source' => 'LDRRMF 70% preparedness share (RA 10121)',
                 'preparedness_share_php' => ['min' => 35000000, 'max' => 51000000],
@@ -79,6 +84,20 @@ class DatabaseSeeder extends Seeder
         }
     }
 
+    private function seedRainfall(Lgu $lgu, string $csvPath): void
+    {
+        // Monthly totals from the Open-Meteo archive (refresh with: php artisan rainfall:sync).
+        $rows = array_map('str_getcsv', file($csvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: []);
+        array_shift($rows);
+
+        foreach ($rows as [$year, $month, $mm]) {
+            RainfallMonthly::updateOrCreate(
+                ['lgu_id' => $lgu->id, 'year' => (int) $year, 'month' => (int) $month],
+                ['rainfall_mm' => (float) $mm, 'source' => 'open-meteo'],
+            );
+        }
+    }
+
     private function seedOutageScenarios(Lgu $lgu): void
     {
         $scenarios = [
@@ -86,7 +105,7 @@ class DatabaseSeeder extends Seeder
                 'slug' => 'turbid-power-cut',
                 'name' => 'Turbid source + power cut',
                 'description' => 'The July 2026 case: heavy rain makes the main source too turbid to treat and a power-line outage stops pumping.',
-                'duration_days' => 5,
+                'duration_days' => 3,
                 'supply_loss' => 0.9,
             ],
             [

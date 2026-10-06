@@ -78,6 +78,8 @@ export type Tank = {
   liters: number | null;
   covered: boolean | null;
   working: boolean | null;
+  /** How long a full tank keeps this building's toilets and cleaning running. */
+  days_of_cover: number | null;
 };
 
 export type Site = {
@@ -91,6 +93,7 @@ export type Site = {
   source_types: SourceKey[];
   greywater_lpd: number | null;
   rain_yield_lpd: number | null;
+  nonpotable_demand_lpd: number | null;
   tank: Tank;
   data_status: DataStatus;
 };
@@ -175,7 +178,15 @@ export type ProgramPreview = {
   phases: { phase: number; label: string; cost_php: Money; tanks: number; drum_covers: number; cards: number }[];
   funding_tag: string;
   share_of_funding: number;
-  barangays: { id: number; days_before: number; days_after: number; status_before: Status; status_after: Status }[];
+  barangays: {
+    id: number;
+    days_before: number;
+    days_after: number;
+    status_before: Status;
+    status_after: Status;
+    greywater_reused_lpd_before: number;
+    greywater_reused_lpd_after: number;
+  }[];
 };
 
 export type StorageRegistry = {
