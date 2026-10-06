@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { endpoints } from "@/lib/api";
 import { signOutLocally, useAuthUser } from "@/lib/auth";
 import { Icon, type IconName } from "./icon";
+import { Weather } from "./weather";
 
 // auth: shown only to signed-in users (the pages themselves also ask for sign-in).
 const NAV: { href: string; label: string; icon: IconName; auth?: boolean }[] = [
@@ -109,41 +110,6 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-const WEATHER: [number, string][] = [
-  [0, "Clear"],
-  [3, "Cloudy"],
-  [48, "Fog"],
-  [57, "Drizzle"],
-  [67, "Rain"],
-  [77, "Rain"],
-  [82, "Showers"],
-  [99, "Thunderstorm"],
-];
-
-function Weather() {
-  const [now, setNow] = useState<{ t: number; label: string } | null>(null);
-  useEffect(() => {
-    const url =
-      "https://api.open-meteo.com/v1/forecast?latitude=11.7753&longitude=124.8829&current=temperature_2m,weather_code&timezone=Asia%2FManila";
-    fetch(url)
-      .then((r) => r.json())
-      .then((j) => {
-        const code = j.current.weather_code as number;
-        setNow({ t: Math.round(j.current.temperature_2m), label: (WEATHER.find(([max]) => code <= max) ?? [0, "Weather"])[1] });
-      })
-      .catch(() => {});
-  }, []);
-  if (!now) return null;
-  return (
-    <div className="hidden items-center gap-2 border-l border-white/30 pl-4 sm:flex" title="Open-Meteo, Catbalogan">
-      <Icon name="rain" size={18} />
-      <span className="text-sm leading-tight font-bold">
-        {now.t}°C<small className="block text-[11px] font-medium text-white/75">{now.label}</small>
-      </span>
-    </div>
-  );
-}
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -178,7 +144,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="block text-[10px] font-extrabold tracking-[0.16em] text-white/75">ACTIVE LGU</span>
             <span className="text-sm font-bold">Catbalogan City</span>
           </div>
-          <div className="ml-auto flex items-center gap-4">
+          <div className="ml-auto flex items-center gap-4 -mr-1">
             <Weather />
           </div>
         </header>
