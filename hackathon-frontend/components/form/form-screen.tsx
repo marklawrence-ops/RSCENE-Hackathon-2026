@@ -303,7 +303,7 @@ export default function FormScreen() {
                 {sent.map((s) => (
                   <li key={s.client_uuid} className="flex justify-between gap-2">
                     <span>
-                      <span style={{ color: STATUS.green.color }}>✓</span> {s.barangay_name} · {s.period}
+                      <span style={{ color: STATUS.green.ink }}>✓</span> {s.barangay_name} · {s.period}
                     </span>
                     <span className="text-xs text-muted">{new Date(s.synced_at).toLocaleString("en-PH", { dateStyle: "medium", timeStyle: "short" })}</span>
                   </li>

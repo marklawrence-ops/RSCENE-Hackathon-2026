@@ -291,7 +291,7 @@ function CitySummary({ list, run }: { list: BarangayList; run: OutageRun | null 
       <div className="mt-1.5 grid grid-cols-3 gap-1.5 text-center">
         {tiles.map(([st, n, label]) => (
           <div key={st} className="rounded-xl bg-white/70 px-1 py-1.5">
-            <p className="text-lg leading-none font-extrabold tabular-nums" style={{ color: STATUS[st].color }}>
+            <p className="text-lg leading-none font-extrabold tabular-nums" style={{ color: STATUS[st].ink }}>
               {n}
             </p>
             <p className="mt-1 text-[10px] font-semibold text-[#5f6869]">{label}</p>

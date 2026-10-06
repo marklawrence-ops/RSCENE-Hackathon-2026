@@ -17,10 +17,12 @@ export function peso(n: number): string {
 
 export const days = (n: number) => `${n.toFixed(1)} ${n === 1 ? "day" : "days"}`;
 
-export const STATUS: Record<Status, { color: string; label: string }> = {
-  green: { color: "#15803d", label: "3+ days" },
-  amber: { color: "#d97706", label: "1–3 days" },
-  red: { color: "#dc2626", label: "Under 1 day" },
+// Soft status palette (easy on the eyes): color = mid tone for fills, bars and dots;
+// tint = pale background; ink = readable text on white or on the tint.
+export const STATUS: Record<Status, { color: string; tint: string; ink: string; label: string }> = {
+  green: { color: "#93c98c", tint: "#dcefd8", ink: "#3a7a34", label: "3+ days" },
+  amber: { color: "#e8bd7e", tint: "#f8e8cf", ink: "#8c5a17", label: "1–3 days" },
+  red: { color: "#e39b93", tint: "#f7dcd9", ink: "#9b3b33", label: "Under 1 day" },
 };
 
 export const OUTCOME: Record<"holds" | "partial" | "fails", { status: Status; label: string }> = {

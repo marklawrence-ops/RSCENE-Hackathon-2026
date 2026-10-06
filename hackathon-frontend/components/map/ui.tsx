@@ -4,8 +4,8 @@ import type { DataStatus, Status } from "@/lib/types";
 export function StatusPill({ status, label }: { status: Status; label?: string }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold text-white"
-      style={{ backgroundColor: STATUS[status].color }}
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold"
+      style={{ backgroundColor: STATUS[status].tint, color: STATUS[status].ink }}
     >
       {label ?? STATUS[status].label}
     </span>

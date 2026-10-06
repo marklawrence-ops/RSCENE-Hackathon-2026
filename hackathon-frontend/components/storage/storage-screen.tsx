@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { endpoints } from "@/lib/api";
-import { days, liters, num } from "@/lib/format";
+import { days, liters, num, STATUS } from "@/lib/format";
 import type { Status, StorageRegistry } from "@/lib/types";
 import { useLguData } from "@/lib/use-lgu-data";
 import { DataTag } from "../map/ui";
@@ -19,9 +19,9 @@ type SortKey = "name" | "days" | "storage" | "short";
 
 // Gentler than the map's STATUS colours: tint for fills, mid for bars and edges, ink for text on the tint.
 const SOFT: Record<Status, { tint: string; mid: string; ink: string }> = {
-  red: { tint: "#f7dcd9", mid: "#e39b93", ink: "#9b3b33" },
-  amber: { tint: "#f8e8cf", mid: "#e8bd7e", ink: "#8c5a17" },
-  green: { tint: "#dcefd8", mid: "#93c98c", ink: "#3a7a34" },
+  red: { tint: STATUS.red.tint, mid: STATUS.red.color, ink: STATUS.red.ink },
+  amber: { tint: STATUS.amber.tint, mid: STATUS.amber.color, ink: STATUS.amber.ink },
+  green: { tint: STATUS.green.tint, mid: STATUS.green.color, ink: STATUS.green.ink },
 };
 
 const statusFor = (d: number, target: number): Status => (d >= target ? "green" : d >= 1 ? "amber" : "red");
@@ -126,7 +126,7 @@ export function StorageScreen() {
   const formsIn = rows.filter((r) => r.formThisQuarter).length;
 
   return (
-    <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-5 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl flex-1 px-3 py-4 sm:px-6 sm:py-5">
       {/* Headline: the answer first */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="max-w-2xl">
@@ -149,7 +149,7 @@ export function StorageScreen() {
       </div>
 
       {/* At a glance: one bar, three groups, click to filter */}
-      <section className="mt-5 rounded-2xl border border-[#dde2e3] bg-white p-4 shadow-[0_2px_5px_rgba(27,56,58,.07)]">
+      <section className="mt-4 rounded-2xl border border-[#dde2e3] bg-white p-3 shadow-[0_2px_5px_rgba(27,56,58,.07)] sm:mt-5 sm:p-4">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="text-sm font-extrabold">Barangays at a glance</h2>
           <span className="text-xs text-muted">Click a group to list it</span>
@@ -170,7 +170,7 @@ export function StorageScreen() {
             ),
           )}
         </div>
-        <ul className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
+        <ul className="mt-2.5 grid gap-1.5 text-xs sm:mt-3 sm:grid-cols-3 sm:gap-2">
           {GROUPS.map((g) => (
             <li key={g.status} className="flex items-start gap-2">
               <span className="mt-0.5 h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: SOFT[g.status].mid }} />
@@ -186,7 +186,7 @@ export function StorageScreen() {
       </section>
 
       {/* Key numbers in plain words */}
-      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-3 lg:grid-cols-4">
         <Total label="Stored water" value={liters(t.storage_liters)} sub={`about ${days(t.days_of_cover)} for the whole city`} />
         <Total label="Covered rain drums" value={num(t.covered_drums)} sub={`${num(totalShort)} more needed for ${target} days`} />
         <Total
@@ -213,7 +213,7 @@ export function StorageScreen() {
       </details>
 
       {/* Controls */}
-      <div className="mt-5 flex flex-wrap items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5">
         <input
           type="search"
           value={query}
@@ -251,20 +251,20 @@ export function StorageScreen() {
         {visible.map((r) => (
           <li
             key={r.barangay_id}
-            className="grid gap-x-6 gap-y-3 border-l-4 px-4 py-3.5 sm:grid-cols-2 lg:grid-cols-[minmax(140px,0.9fr)_minmax(200px,1.3fr)_minmax(160px,1fr)_minmax(190px,1.1fr)] lg:items-start"
+            className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-x-3 gap-y-2 border-l-4 px-3 py-2.5 sm:gap-x-6 sm:px-4 sm:py-3.5 lg:grid-cols-[minmax(140px,0.9fr)_minmax(200px,1.3fr)_minmax(160px,1fr)_minmax(190px,1.1fr)] lg:items-start"
             style={{ borderLeftColor: SOFT[r.status].mid }}
           >
             <div className="min-w-0">
               <CellLabel>Barangay</CellLabel>
               <p className="truncate font-extrabold">{r.name}</p>
-              <p className="text-xs text-muted">{num(r.households)} households</p>
+              <p className="text-[11px] text-muted sm:text-xs">{num(r.households)} households</p>
             </div>
 
             <div>
               <CellLabel>Stored water</CellLabel>
               <div className="flex items-baseline justify-between gap-2 text-xs">
                 <span>
-                  <strong className="text-base font-extrabold tabular-nums">{r.days_of_cover.toFixed(1)}</strong> of {target} days
+                  <strong className="text-[15px] font-extrabold tabular-nums sm:text-base">{r.days_of_cover.toFixed(1)}</strong> of {target} days
                 </span>
                 <span className="text-muted">{liters(r.storage_liters)}</span>
               </div>
@@ -286,7 +286,7 @@ export function StorageScreen() {
 
             <div>
               <CellLabel>Details</CellLabel>
-              <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold">
+              <div className="flex flex-wrap gap-1 text-[10.5px] font-semibold sm:gap-1.5 sm:text-[11px]">
                 <Chip tone="neutral">
                   {num(r.covered_drums)} drums · {r.drumsPerHousehold.toFixed(1)} per home
                 </Chip>
@@ -320,12 +320,12 @@ const GROUPS: { status: Status; label: string; hint: (target: number) => string 
 ];
 
 function CellLabel({ children }: { children: React.ReactNode }) {
-  return <p className="mb-0.5 text-[10px] font-extrabold tracking-[0.12em] text-[#8a9496] uppercase">{children}</p>;
+  return <p className="text-[9px] leading-tight font-extrabold tracking-[0.12em] text-[#8a9496] uppercase sm:mb-0.5 sm:text-[10px]">{children}</p>;
 }
 
 function Total({ label, value, sub, warn }: { label: string; value: string; sub: string; warn?: boolean }) {
   return (
-    <div className="rounded-2xl border border-[#dde2e3] bg-white p-3.5 shadow-[0_2px_5px_rgba(27,56,58,.07)]">
+    <div className="rounded-2xl border border-[#dde2e3] bg-white p-3 shadow-[0_2px_5px_rgba(27,56,58,.07)] sm:p-3.5">
       <p className="text-xs font-bold text-muted">{label}</p>
       <p className="mt-0.5 text-lg font-extrabold tabular-nums">{value}</p>
       <p className={`text-xs ${warn ? "font-semibold text-[#8c5a17]" : "text-muted"}`}>{sub}</p>

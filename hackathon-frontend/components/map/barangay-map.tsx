@@ -135,13 +135,13 @@ export default function BarangayMap(props: Props) {
 
       {barangays.map((b) => {
         const color = colorFor(b);
-        const selected = b.id === selectedId;
         const style = {
           color: "#ffffff",
           weight: 1.5,
           fillColor: color,
           // See-through enough that street and place labels stay readable.
-          fillOpacity: selected ? 0.7 : 0.45,
+          // Same fill whether selected or not; the dark outline marks the selection.
+          fillOpacity: 0.7,
         };
         const shape = shapes.get(b.id);
         const handlers = { click: () => onSelect(b.id) };

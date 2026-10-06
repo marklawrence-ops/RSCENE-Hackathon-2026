@@ -37,7 +37,7 @@ body {
     fill-opacity 0.25s ease;
 }
 .barangay-shape:hover {
-  fill-opacity: 0.7;
+  fill-opacity: 0.82;
 }
 .leaflet-container {
   font-family: inherit;
