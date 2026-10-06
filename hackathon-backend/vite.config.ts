@@ -66,6 +66,10 @@ export default defineConfig({
         ignorePatterns: [
             '.github/**',
             'composer.json',
+            // Hand-written docs and source data files are kept as authored.
+            'README.md',
+            'docs/**',
+            'database/data/**',
             'resources/js/components/ui/*',
             'resources/views/mail/*',
         ],
