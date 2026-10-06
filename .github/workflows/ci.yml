@@ -35,14 +35,22 @@ jobs:
         with:
           node-version: '22'
 
+      # .env.example points at PostgreSQL, which CI doesn't run. Setup migrates a throwaway
+      # SQLite file instead; the tests themselves use in-memory SQLite (phpunit.xml).
+      - name: Create SQLite database
+        run: touch database/database.sqlite
+
       - name: Setup Application
         run: composer setup
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ${{ github.workspace }}/hackathon-backend/database/database.sqlite
 
       - name: Run CI Checks
         run: composer ci:check
 
   frontend:
-    name: Frontend (ESLint, TypeScript, build)
+    name: Frontend (ESLint, type check, build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -67,10 +75,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Type check
-        run: npx tsc --noEmit
-
-      - name: Build
+      # next build also type-checks, after generating Next's route types (LayoutProps, PageProps).
+      - name: Type check and build
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: https://rscene-hackathon-2026-production-eacvqt.laravel.cloud
