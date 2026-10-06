@@ -57,9 +57,9 @@ test('reuse gap subtracts greywater already reused by households', function () {
     $b = barangayWithDrums($this->lgu, 1000, 0);
     $m = WaterModel::for($this->lgu)->metrics($b);
 
-    // 46,847 L potential − 40 households × 5 × 46.85 L.
+    // 46,847 L potential − 40 households × 5 × 46.85 L × 0.4 reuse fraction.
     expect($m['greywater_lpd'])->toBe(46847)
-        ->and($m['reuse_gap_lpd'])->toBe(37477);
+        ->and($m['reuse_gap_lpd'])->toBe(43099);
 });
 
 test('rain yield uses the last 12 months of Open-Meteo rainfall', function () {

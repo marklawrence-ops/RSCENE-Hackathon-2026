@@ -138,7 +138,7 @@ export function MapScreen() {
         const r = outageById.get(b.id);
         return r ? `${OUTCOME[r.outcome].label} · ${days(r.days_of_cover)}` : "";
       }
-      if (layer === "reuse") return `${pct(reuseShare(b.metrics))} of greywater reused`;
+      if (layer === "reuse") return `${pct(reuseShare(b.metrics))} of households reuse water`;
       return `${days(b.metrics.days_of_cover)} of stored water`;
     },
     [showOutage, outageById, layer],
@@ -228,7 +228,7 @@ export function MapScreen() {
           <div role="radiogroup" aria-label="Map colours" className="mt-2 grid grid-cols-2 gap-1 rounded-xl bg-black/5 p-1 text-xs font-bold">
             {(
               [
-                ["reuse", "Greywater reused"],
+                ["reuse", "Reuse"],
                 ["storage", "Stored water"],
               ] as const
             ).map(([key, label]) => (
@@ -263,7 +263,7 @@ export function MapScreen() {
       {/* Legend + view switch (hidden on phones while the details sheet is open) */}
       <div className={`glass absolute bottom-6 left-3 z-[1000] rounded-2xl p-2 text-xs sm:p-3 ${panelOpen ? "hidden lg:block" : ""}`}>
         <p className="mb-1.5 hidden font-bold sm:block">
-          {showOutage ? `${scenario?.name ?? "Outage"}` : layer === "reuse" ? "Share of greywater reused" : "Days of stored water"}
+          {showOutage ? `${scenario?.name ?? "Outage"}` : layer === "reuse" ? "Households reusing water" : "Days of stored water"}
         </p>
         <ul className="flex flex-wrap gap-x-3 gap-y-1 sm:block sm:space-y-1">
           {(showOutage
@@ -318,15 +318,15 @@ function CitySummary({ list, run, layer }: { list: BarangayList; run: OutageRun 
   const reusing = list.barangays.reduce((sum, b) => sum + b.metrics.reusing_households, 0);
 
   if (!run && layer === "reuse") {
-    const share = reusable > 0 ? reused / reusable : 0;
+    const share = households > 0 ? reusing / households : 0;
     return (
       <div className="mt-2.5 border-t border-black/10 px-1 pt-2.5">
         <p className="text-xs text-[#5f6869]">
           <strong className="text-foreground">{list.lgu.name}</strong> · {num(t.population)} people · {list.barangays.length} barangays <DataTag status="real" />
         </p>
         <p className="mt-2 text-sm leading-snug">
-          Only <strong>{pct(share)}</strong> of shower and laundry water gets a second use. The rest, about{" "}
-          <strong>{liters(reusable - reused)}</strong> a day, goes down the drain.
+          Only <strong>{pct(share)}</strong> of households reuse shower or laundry water. About <strong>{liters(reusable - reused)}</strong> a day
+          still goes down the drain.
         </p>
         <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/80 ring-1 ring-black/5" aria-hidden>
           <div className="h-full rounded-full" style={{ width: `${Math.max(2, share * 100)}%`, backgroundColor: REUSE_BANDS[0].color }} />
@@ -347,7 +347,10 @@ function CitySummary({ list, run, layer }: { list: BarangayList; run: OutageRun 
             </dd>
           </div>
         </dl>
-        <p className="mt-2 text-[11px] text-[#5f6869]">Pale barangays reuse the least. Click one to see its reuse gap and buildings.</p>
+        <p className="mt-2 text-[11px] text-[#5f6869]">
+          A reusing household reuses on at least 3 days a week, about {pct(list.settings.reuse_fraction ?? 0.4)} of its greywater{" "}
+          <DataTag status="assumed" />. Pale barangays reuse the least; click one for its reuse gap and buildings.
+        </p>
       </div>
     );
   }

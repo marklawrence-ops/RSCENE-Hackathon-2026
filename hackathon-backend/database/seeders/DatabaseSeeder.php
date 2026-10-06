@@ -47,6 +47,9 @@ class DatabaseSeeder extends Seeder
             'liters_per_person_day' => 90.09,
             'usage_split' => ['bathing' => 0.44, 'toilet' => 0.30, 'cooking' => 0.16, 'laundry' => 0.08, 'drinking' => 0.02],
             'household_size' => 5,
+            // Share of its greywater a "reusing" household actually reuses (form definition: reuses on at least
+            // 3 days a week). Assumption until pilot spot checks measure it.
+            'reuse_fraction' => 0.4,
             'runoff_coefficient' => 0.8,
             'drum_liters' => 200,
             'target_days_of_cover' => 3,

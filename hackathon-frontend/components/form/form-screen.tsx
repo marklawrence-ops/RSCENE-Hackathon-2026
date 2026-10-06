@@ -556,7 +556,21 @@ function FormCard({ user, barangays, onQueued }: { user: User; barangays: Cached
         <FieldError msg={errors.covered_drums} />
       </Step>
 
-      <Step n={4} title="How many households reuse water?" hint="Counts: laundry rinse water used to flush; shower water poured on plants. Doesn't count: kitchen sink water.">
+      <Step
+        n={4}
+        title="How many households reuse water?"
+        hint="Count a household if it reuses shower or laundry water on at least 3 days a week."
+      >
+        <div className="mb-3 grid gap-2 text-xs sm:grid-cols-2">
+          <div className="rounded-xl bg-[#e9f6ea] px-3 py-2">
+            <p className="font-extrabold text-[#3a7a34]">✓ Counts</p>
+            <p className="mt-0.5 text-[#44514f]">Laundry rinse water used to flush or mop · shower water poured on plants or used to flush</p>
+          </div>
+          <div className="rounded-xl bg-[#f9e6e3] px-3 py-2">
+            <p className="font-extrabold text-[#9b3b33]">✕ Doesn&apos;t count</p>
+            <p className="mt-0.5 text-[#44514f]">Kitchen sink or toilet water · reusing only now and then (less than 3 days a week)</p>
+          </div>
+        </div>
         <div className="flex flex-wrap items-end gap-3">
           <BigNumber label="Reusing" value={values.reusing_households} onChange={(v) => setValue("reusing_households", v)} placeholder="e.g. 40" />
           <span className="pb-3 text-sm text-muted">out of</span>

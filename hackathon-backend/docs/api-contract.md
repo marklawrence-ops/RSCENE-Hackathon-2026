@@ -50,7 +50,7 @@ type BarangayMetrics = {
   reusing_households: number       // from latest form; 0 if none
   households: number               // households_estimate from form, else population ÷ household_size
   adoption_rate: number            // reusing_households ÷ households
-  reuse_gap_lpd: number            // greywater_lpd − reusing_households × greywater per household
+  reuse_gap_lpd: number            // greywater_lpd − reusing_households × greywater per household × reuse_fraction (LGU setting, assumed 0.4)
   storage_liters: number           // working public tanks + covered drums × drum_liters
   days_of_cover: number            // storage_liters ÷ nonpotable_demand_lpd, 1 decimal
   readiness_score: number          // 0–100, see formula below
@@ -159,7 +159,7 @@ Request `{ "email": "cdrrmo@demo.test", "password": "…", "device_name": "pixel
 ```json
 {
   "lgu": { "...": "Lgu" },
-  "settings": { "liters_per_person_day": 90.09, "household_size": 5, "drum_liters": 200, "target_days_of_cover": 3 },
+  "settings": { "liters_per_person_day": 90.09, "household_size": 5, "drum_liters": 200, "target_days_of_cover": 3, "reuse_fraction": 0.4 },
   "totals": { "population": 106440, "greywater_lpd": 4987000, "storage_liters": 0, "days_of_cover": 0.0, "status_counts": { "green": 0, "amber": 0, "red": 57 } },
   "barangays": [ "BarangaySummary", "…" ]
 }

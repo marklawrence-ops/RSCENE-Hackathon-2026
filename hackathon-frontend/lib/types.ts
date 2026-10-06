@@ -35,6 +35,8 @@ export type LguSettings = {
   household_size: number;
   drum_liters: number;
   target_days_of_cover: number;
+  /** Share of its greywater a reusing household actually reuses (assumed). */
+  reuse_fraction: number;
 };
 
 export type BarangayMetrics = {

@@ -43,7 +43,7 @@ export const MOCK_LGU: Lgu = {
   is_simulated: false,
 };
 
-const SETTINGS: LguSettings = { liters_per_person_day: 90.09, household_size: 5, drum_liters: 200, target_days_of_cover: 3 };
+const SETTINGS: LguSettings = { liters_per_person_day: 90.09, household_size: 5, drum_liters: 200, target_days_of_cover: 3, reuse_fraction: 0.4 };
 const LPD = SETTINGS.liters_per_person_day;
 const COST = { tank: { min: 17000, max: 30000 }, cover: { min: 155, max: 210 }, card: 8, training: 15000 };
 
@@ -97,7 +97,7 @@ function summarize(r: Raw, extraLiters = 0): BarangaySummary {
       reusing_households: r.reusing,
       households: r.households,
       adoption_rate: Math.round(adoption * 1000) / 1000,
-      reuse_gap_lpd: Math.round(greywater - r.reusing * SETTINGS.household_size * 0.52 * LPD),
+      reuse_gap_lpd: Math.round(greywater - r.reusing * SETTINGS.household_size * 0.52 * LPD * SETTINGS.reuse_fraction),
       storage_liters: storage,
       days_of_cover: days,
       readiness_score: Math.round(
@@ -208,7 +208,7 @@ function programPreview(input: ProgramInput): ProgramPreview {
       status_before: before.status,
       status_after: after.status,
       greywater_reused_lpd_before: before.greywater_lpd - before.reuse_gap_lpd,
-      greywater_reused_lpd_after: Math.round(before.greywater_lpd * input.adoption_rate),
+      greywater_reused_lpd_after: Math.round(before.greywater_lpd * input.adoption_rate * SETTINGS.reuse_fraction),
     };
   });
   const cost = {

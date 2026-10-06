@@ -35,6 +35,8 @@ class WaterModel
 
     private float $annualRainMm;
 
+    private float $reuseFraction;
+
     public function __construct(private Lgu $lgu)
     {
         $s = $lgu->settings;
@@ -44,6 +46,7 @@ class WaterModel
         $this->drumLiters = (int) ($s['drum_liters'] ?? 200);
         $this->targetDays = (float) ($s['target_days_of_cover'] ?? 3);
         $this->runoff = (float) ($s['runoff_coefficient'] ?? 0.8);
+        $this->reuseFraction = (float) ($s['reuse_fraction'] ?? 0.4);
         $this->annualRainMm = $this->lastTwelveMonthsRain() ?? (float) ($s['annual_rainfall_mm'] ?? 2991);
     }
 
@@ -79,6 +82,7 @@ class WaterModel
             'household_size' => $this->householdSize,
             'drum_liters' => $this->drumLiters,
             'target_days_of_cover' => $this->targetDays,
+            'reuse_fraction' => $this->reuseFraction,
         ];
     }
 
@@ -142,7 +146,8 @@ class WaterModel
             'reusing_households' => $reusing,
             'households' => $households,
             'adoption_rate' => round($adoption, 3),
-            'reuse_gap_lpd' => (int) round(max(0, $greywater - $reusing * $greywaterPerHousehold)),
+            // A reusing household reuses only part of its greywater (reuse_fraction, assumed).
+            'reuse_gap_lpd' => (int) round(max(0, $greywater - $reusing * $greywaterPerHousehold * $this->reuseFraction)),
             'storage_liters' => (int) round($storage),
             'days_of_cover' => $days,
             'readiness_score' => (int) round(
