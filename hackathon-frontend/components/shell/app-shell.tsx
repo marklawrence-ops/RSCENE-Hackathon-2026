@@ -128,7 +128,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const bottom = user ? BOTTOM_BY_ROLE[user.role] ?? BOTTOM_BY_ROLE.planner : BOTTOM_PUBLIC;
 
   return (
-    <div className="flex h-dvh bg-white print:block print:h-auto">
+    // Pinned to the visible screen (fixed + inset-0) rather than sized with 100dvh: after a
+    // pull-to-refresh on Android the dvh value can exceed the visible area and push the tab bar off-screen.
+    <div className="fixed inset-0 flex bg-white print:static print:block print:h-auto">
       <aside className="hidden w-[252px] shrink-0 border-r border-[#e4e7e8] bg-white shadow-[3px_0_14px_rgba(32,63,66,.04)] lg:block print:hidden">
         <Sidebar />
       </aside>
