@@ -60,3 +60,21 @@ export const DATA_STATUS_LABEL: Record<DataStatus, string> = {
   assumed: "Assumed",
   simulated: "Simulated",
 };
+
+// Reuse layer: share of light greywater (shower, laundry) that households already reuse.
+// Sequential teal so it never reads as good/bad storage status.
+export type ReuseBand = { min: number; color: string; ink: string; label: string };
+export const REUSE_BANDS: ReuseBand[] = [
+  { min: 0.2, color: "#2f8f99", ink: "#1d6870", label: "20% or more" },
+  { min: 0.1, color: "#6cc3cb", ink: "#22737b", label: "10–20%" },
+  { min: 0.05, color: "#a9dde1", ink: "#2c7d85", label: "5–10%" },
+  { min: 0, color: "#dcf1f2", ink: "#3d8188", label: "Under 5%" },
+];
+
+/** Share of light greywater reused today, 0–1. */
+export const reuseShare = (m: { greywater_lpd: number; reuse_gap_lpd: number }) =>
+  m.greywater_lpd > 0 ? (m.greywater_lpd - m.reuse_gap_lpd) / m.greywater_lpd : 0;
+
+export const reuseBand = (share: number) => REUSE_BANDS.find((b) => share >= b.min) ?? REUSE_BANDS[REUSE_BANDS.length - 1];
+
+export const pct = (share: number) => `${Math.round(share * 100)}%`;

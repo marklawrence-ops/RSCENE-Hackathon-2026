@@ -16,6 +16,7 @@ const NAV: { href: string; label: string; icon: IconName; auth?: boolean }[] = [
   { href: "/storage", label: "Storage Registry", icon: "storage", auth: true },
   { href: "/form", label: "Barangay Form", icon: "clipboard", auth: true },
   { href: "/guide", label: "Household Guide", icon: "book" },
+  { href: "/about", label: "About & credits", icon: "people" },
 ];
 
 const BOTTOM_SIGNED_IN: { href: string; label: string; icon: IconName }[] = [

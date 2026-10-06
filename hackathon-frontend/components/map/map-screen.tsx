@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { endpoints } from "@/lib/api";
-import { days, liters, num, OUTCOME, STATUS } from "@/lib/format";
+import { days, liters, num, OUTCOME, pct, REUSE_BANDS, reuseBand, reuseShare, STATUS } from "@/lib/format";
 import type { BarangayDetail, BarangayList, BarangaySummary, OutageRun, Site, SiteMatches } from "@/lib/types";
 import { useLguData } from "@/lib/use-lgu-data";
 import type { MapView } from "./barangay-map";
@@ -20,6 +20,9 @@ const BarangayMap = dynamic(() => import("./barangay-map"), {
 });
 
 const isOutageParam = (p: { get(key: string): string | null } | null) => p?.get("outage") === "1";
+
+// What the barangay colours show outside Outage Mode.
+type Layer = "reuse" | "storage";
 
 export function MapScreen() {
   const searchParams = useSearchParams();
@@ -49,6 +52,8 @@ export function MapScreen() {
   const [scenarioSlug, setScenarioSlug] = useState<string>("turbid-power-cut");
   const [run, setRun] = useState<OutageRun | null>(null);
   const [view, setView] = useState<MapView>("town");
+  // Reuse first (it is the Reuse Map); /map?layer=storage opens on stored water.
+  const [layer, setLayer] = useState<Layer>(() => (searchParams?.get("layer") === "storage" ? "storage" : "reuse"));
   const [summaryOpen, setSummaryOpen] = useState(false);
   // Only the latest click may fill the panel, even if an earlier request answers last.
   const latestBarangay = useRef<number | null>(null);
@@ -117,10 +122,26 @@ export function MapScreen() {
   const outageById = useMemo(() => new Map(run?.results.map((r) => [r.barangay_id, r]) ?? []), [run]);
   const showOutage = outageOn && run !== null;
 
-  // Normal map: days of stored water. Outage Mode: whether each barangay holds out.
+  // Outage Mode: whether each barangay holds out. Otherwise the chosen layer:
+  // share of greywater already reused, or days of stored water.
   const colorFor = useCallback(
-    (b: BarangaySummary) => STATUS[showOutage ? (outageById.get(b.id)?.status ?? "green") : b.metrics.status].color,
-    [showOutage, outageById],
+    (b: BarangaySummary) => {
+      if (showOutage) return STATUS[outageById.get(b.id)?.status ?? "green"].color;
+      if (layer === "reuse") return reuseBand(reuseShare(b.metrics)).color;
+      return STATUS[b.metrics.status].color;
+    },
+    [showOutage, outageById, layer],
+  );
+  const tooltipFor = useCallback(
+    (b: BarangaySummary) => {
+      if (showOutage) {
+        const r = outageById.get(b.id);
+        return r ? `${OUTCOME[r.outcome].label} · ${days(r.days_of_cover)}` : "";
+      }
+      if (layer === "reuse") return `${pct(reuseShare(b.metrics))} of greywater reused`;
+      return `${days(b.metrics.days_of_cover)} of stored water`;
+    },
+    [showOutage, outageById, layer],
   );
 
   // Pulse only the 5 roofs where one new tank adds the most days: small barangays that run out.
@@ -163,6 +184,7 @@ export function MapScreen() {
             barangays={list.barangays}
             boundaries={boundaries}
             colorFor={colorFor}
+            tooltipFor={tooltipFor}
             selectedId={selectedId}
             onSelect={selectBarangay}
             sites={sites}
@@ -202,6 +224,26 @@ export function MapScreen() {
             ))}
           </select>
         </div>
+        {!outageOn && (
+          <div role="radiogroup" aria-label="Map colours" className="mt-2 grid grid-cols-2 gap-1 rounded-xl bg-black/5 p-1 text-xs font-bold">
+            {(
+              [
+                ["reuse", "Greywater reused"],
+                ["storage", "Stored water"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                role="radio"
+                aria-checked={layer === key}
+                onClick={() => setLayer(key)}
+                className={`rounded-lg px-2 py-1.5 transition ${layer === key ? "bg-white text-brand shadow-sm" : "text-[#5f6869] hover:bg-white/60"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
         {list && (
           <>
             <button
@@ -212,7 +254,7 @@ export function MapScreen() {
               {list.lgu.name} summary <span aria-hidden>{summaryOpen ? "▴" : "▾"}</span>
             </button>
             <div className={`${summaryOpen ? "block" : "hidden"} lg:block`}>
-              <CitySummary list={list} run={showOutage ? run : null} />
+              <CitySummary list={list} run={showOutage ? run : null} layer={layer} />
             </div>
           </>
         )}
@@ -220,14 +262,18 @@ export function MapScreen() {
 
       {/* Legend + view switch (hidden on phones while the details sheet is open) */}
       <div className={`glass absolute bottom-6 left-3 z-[1000] rounded-2xl p-2 text-xs sm:p-3 ${panelOpen ? "hidden lg:block" : ""}`}>
-        <p className="mb-1.5 hidden font-bold sm:block">{showOutage ? `${scenario?.name ?? "Outage"}` : "Days of stored water"}</p>
-        <ul className="flex gap-3 sm:block sm:space-y-1">
+        <p className="mb-1.5 hidden font-bold sm:block">
+          {showOutage ? `${scenario?.name ?? "Outage"}` : layer === "reuse" ? "Share of greywater reused" : "Days of stored water"}
+        </p>
+        <ul className="flex flex-wrap gap-x-3 gap-y-1 sm:block sm:space-y-1">
           {(showOutage
             ? (["holds", "partial", "fails"] as const).map((o) => ({ color: STATUS[OUTCOME[o].status].color, label: OUTCOME[o].label }))
-            : (["green", "amber", "red"] as const).map((st) => ({ color: STATUS[st].color, label: STATUS[st].label }))
+            : layer === "reuse"
+              ? REUSE_BANDS.map((band) => ({ color: band.color, label: band.label }))
+              : (["green", "amber", "red"] as const).map((st) => ({ color: STATUS[st].color, label: STATUS[st].label }))
           ).map((row) => (
             <li key={row.label} className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: row.color }} />
+              <span className="h-3 w-3 rounded-full ring-1 ring-black/10" style={{ backgroundColor: row.color }} />
               {row.label}
             </li>
           ))}
@@ -264,10 +310,48 @@ export function MapScreen() {
   );
 }
 
-function CitySummary({ list, run }: { list: BarangayList; run: OutageRun | null }) {
+function CitySummary({ list, run, layer }: { list: BarangayList; run: OutageRun | null; layer: Layer }) {
   const t = list.totals;
   const reusable = list.barangays.reduce((sum, b) => sum + b.metrics.greywater_lpd, 0);
   const reused = list.barangays.reduce((sum, b) => sum + (b.metrics.greywater_lpd - b.metrics.reuse_gap_lpd), 0);
+  const households = list.barangays.reduce((sum, b) => sum + b.metrics.households, 0);
+  const reusing = list.barangays.reduce((sum, b) => sum + b.metrics.reusing_households, 0);
+
+  if (!run && layer === "reuse") {
+    const share = reusable > 0 ? reused / reusable : 0;
+    return (
+      <div className="mt-2.5 border-t border-black/10 px-1 pt-2.5">
+        <p className="text-xs text-[#5f6869]">
+          <strong className="text-foreground">{list.lgu.name}</strong> · {num(t.population)} people · {list.barangays.length} barangays <DataTag status="real" />
+        </p>
+        <p className="mt-2 text-sm leading-snug">
+          Only <strong>{pct(share)}</strong> of shower and laundry water gets a second use. The rest, about{" "}
+          <strong>{liters(reusable - reused)}</strong> a day, goes down the drain.
+        </p>
+        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/80 ring-1 ring-black/5" aria-hidden>
+          <div className="h-full rounded-full" style={{ width: `${Math.max(2, share * 100)}%`, backgroundColor: REUSE_BANDS[0].color }} />
+        </div>
+        <dl className="mt-2 space-y-0.5 text-xs">
+          <div className="flex justify-between gap-2">
+            <dt className="text-[#5f6869]">Light greywater produced</dt>
+            <dd className="font-bold tabular-nums">{liters(reusable)}/day</dd>
+          </div>
+          <div className="flex justify-between gap-2">
+            <dt className="text-[#5f6869]">Reused today (estimate)</dt>
+            <dd className="font-bold tabular-nums">{liters(reused)}/day</dd>
+          </div>
+          <div className="flex justify-between gap-2">
+            <dt className="text-[#5f6869]">Households reusing</dt>
+            <dd className="font-bold tabular-nums">
+              {num(reusing)} of {num(households)} <DataTag status="simulated" />
+            </dd>
+          </div>
+        </dl>
+        <p className="mt-2 text-[11px] text-[#5f6869]">Pale barangays reuse the least. Click one to see its reuse gap and buildings.</p>
+      </div>
+    );
+  }
+
   const tiles = run
     ? ([
         ["green", run.summary.holds, "hold out"],

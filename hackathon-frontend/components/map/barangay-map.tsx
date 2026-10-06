@@ -12,6 +12,8 @@ type Props = {
   barangays: BarangaySummary[];
   boundaries: BoundaryFeature[];
   colorFor: (b: BarangaySummary) => string;
+  /** Optional second line in the hover label, e.g. the value the colour shows. */
+  tooltipFor?: (b: BarangaySummary) => string;
   selectedId: number | null;
   onSelect: (id: number) => void;
   sites: Site[];
@@ -66,7 +68,7 @@ function FollowSelection({ bounds }: { bounds: LatLngBounds | null }) {
 }
 
 export default function BarangayMap(props: Props) {
-  const { barangays, boundaries, colorFor, selectedId, onSelect, sites, selectedSiteId, onSelectSite, suggestedSiteIds, defaultBounds, view } = props;
+  const { barangays, boundaries, colorFor, tooltipFor, selectedId, onSelect, sites, selectedSiteId, onSelectSite, suggestedSiteIds, defaultBounds, view } = props;
 
   // Buildings show only for the selected barangay; with nothing selected the map stays clean.
   const visibleSites = useMemo(
@@ -128,7 +130,8 @@ export default function BarangayMap(props: Props) {
         const handlers = { click: () => onSelect(b.id) };
         const tooltip = (
           <Tooltip sticky direction="top" offset={[0, -6]}>
-            {b.name}
+            <strong>{b.name}</strong>
+            {tooltipFor && <span className="block text-[11px]">{tooltipFor(b)}</span>}
           </Tooltip>
         );
 
