@@ -16,7 +16,9 @@ Sign-in (Oct 6 night): Program Designer, Storage Registry and Barangay Form are 
 Shared shell (AGOS design, Oct 6 evening; nav: Overview, Reuse Map (Outage Mode is its toggle), Program Designer, Storage Registry, Barangay Form, Household Guide): left sidebar on desktop, aqua top bar with active LGU and live Open-Meteo weather,
 bottom tab bar + drawer on phones; Manrope; light theme only. Previous shell: top bar `[logo] Water Planner   [LGU ▾ Catbalogan]   Map · Designer · Storage · Form   [login]`. On a phone the links collapse into a bottom tab bar.
 
-## `/map`: Reuse Network Map
+## `/map`: Reuse Map
+
+Built (Oct 6 night): full-bleed map. Top-left translucent card = Outage Mode switch + scenario + city summary (status counts, or outage counts when on; greywater, reused, storage); on phones the summary folds behind a button. The details panel is a translucent card that appears only when a barangay or building is selected (right side on laptops, bottom sheet on phones), closed with ✕ or Esc. The sketch below is the earlier layout.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐

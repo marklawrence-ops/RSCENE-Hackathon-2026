@@ -10,7 +10,7 @@ import { useLguData } from "@/lib/use-lgu-data";
 import type { MapView } from "./barangay-map";
 import { BarangayPanel } from "./barangay-panel";
 import { SitePanel } from "./site-panel";
-import { DataTag, StatusPill } from "./ui";
+import { DataTag } from "./ui";
 
 // Leaflet touches `window`, so the map only renders in the browser.
 const BarangayMap = dynamic(() => import("./barangay-map"), {
@@ -48,6 +48,7 @@ export function MapScreen() {
   const [scenarioSlug, setScenarioSlug] = useState<string>("turbid-power-cut");
   const [run, setRun] = useState<OutageRun | null>(null);
   const [view, setView] = useState<MapView>("town");
+  const [summaryOpen, setSummaryOpen] = useState(false);
   // Only the latest click may fill the panel, even if an earlier request answers last.
   const latestBarangay = useRef<number | null>(null);
   const latestSite = useRef<number | null>(null);
@@ -90,6 +91,20 @@ export function MapScreen() {
     },
     [selectedId, selectBarangay],
   );
+
+  // Esc closes the details panel.
+  useEffect(() => {
+    if (selectedId === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setSelectedId(null);
+      setDetail(null);
+      setSite(null);
+      setMatches(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedId]);
 
   const clearSelection = () => {
     setSelectedId(null);
@@ -136,43 +151,12 @@ export function MapScreen() {
     );
   }
 
-  return (
-    <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-      <section className="relative h-[55dvh] shrink-0 lg:h-auto lg:flex-1">
-        {/* Outage Mode bar */}
-        <div className="absolute top-3 right-3 left-3 z-[1000] flex flex-wrap items-center gap-2 rounded-xl bg-white/95 p-2 text-sm shadow-md lg:right-auto dark:bg-zinc-900/95">
-          <button
-            role="switch"
-            aria-checked={outageOn}
-            onClick={() => setOutageOn((v) => !v)}
-            className={`flex items-center gap-2 rounded-lg px-3 py-1.5 font-semibold ${outageOn ? "bg-red-600 text-white" : "bg-zinc-100 dark:bg-zinc-800"}`}
-          >
-            <span className={`h-4 w-7 rounded-full p-0.5 ${outageOn ? "bg-white/40" : "bg-zinc-300 dark:bg-zinc-600"}`}>
-              <span className={`block h-3 w-3 rounded-full bg-white transition-transform ${outageOn ? "translate-x-3" : ""}`} />
-            </span>
-            Outage Mode
-          </button>
-          <select
-            value={scenarioSlug}
-            onChange={(e) => setScenarioSlug(e.target.value)}
-            className="rounded-lg border border-black/10 bg-transparent px-2 py-1.5 dark:border-white/15"
-            aria-label="Outage scenario"
-          >
-            {scenarios.map((s) => (
-              <option key={s.slug} value={s.slug}>
-                {s.name} ({s.duration_days} days)
-              </option>
-            ))}
-          </select>
-          {showOutage && (
-            <span className="flex gap-3 px-1 text-xs font-medium">
-              <span style={{ color: STATUS.green.color }}>{run.summary.holds} hold out</span>
-              <span style={{ color: STATUS.amber.color }}>{run.summary.partial} partly</span>
-              <span style={{ color: STATUS.red.color }}>{run.summary.fails} run out</span>
-            </span>
-          )}
-        </div>
+  const panelOpen = Boolean(list && (site || selected));
 
+  return (
+    <div className={`relative min-h-0 flex-1 overflow-hidden ${panelOpen ? "map-panel-open" : ""}`}>
+      {/* Full-bleed map */}
+      <div className="absolute inset-0">
         {list && (
           <BarangayMap
             barangays={list.barangays}
@@ -188,114 +172,153 @@ export function MapScreen() {
             view={view}
           />
         )}
+      </div>
 
-        {/* Legend + view switch */}
-        <div className="absolute bottom-6 left-3 z-[1000] rounded-xl bg-white/95 p-2 text-xs shadow-md sm:p-3 dark:bg-zinc-900/95">
-          <p className="mb-1.5 hidden font-semibold sm:block">{showOutage ? `${scenario?.name ?? "Outage"}` : "Days of stored water"}</p>
-          <ul className="flex gap-3 sm:block sm:space-y-1">
-            {(showOutage
-              ? (["holds", "partial", "fails"] as const).map((o) => ({ color: STATUS[OUTCOME[o].status].color, label: OUTCOME[o].label }))
-              : (["green", "amber", "red"] as const).map((s) => ({ color: STATUS[s].color, label: STATUS[s].label }))
-            ).map((row) => (
-              <li key={row.label} className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: row.color }} />
-                {row.label}
-              </li>
+      {/* Outage Mode + city summary, one translucent card */}
+      <div className="glass absolute top-3 left-3 z-[1000] w-[min(360px,calc(100%-1.5rem))] rounded-2xl p-2.5 text-sm">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            role="switch"
+            aria-checked={outageOn}
+            onClick={() => setOutageOn((v) => !v)}
+            className={`flex items-center gap-2 rounded-xl px-3 py-1.5 font-bold transition ${outageOn ? "bg-red-600 text-white" : "bg-white/80 text-foreground hover:bg-white"}`}
+          >
+            <span className={`h-4 w-7 rounded-full p-0.5 transition ${outageOn ? "bg-white/40" : "bg-zinc-300"}`}>
+              <span className={`block h-3 w-3 rounded-full bg-white shadow-sm transition-transform ${outageOn ? "translate-x-3" : ""}`} />
+            </span>
+            Outage Mode
+          </button>
+          <select
+            value={scenarioSlug}
+            onChange={(e) => setScenarioSlug(e.target.value)}
+            className="min-w-0 flex-1 rounded-xl border border-black/10 bg-white/70 px-2 py-1.5"
+            aria-label="Outage scenario"
+          >
+            {scenarios.map((sc) => (
+              <option key={sc.slug} value={sc.slug}>
+                {sc.name} ({sc.duration_days} days)
+              </option>
             ))}
-          </ul>
-          <p className="mt-2 hidden text-zinc-500 sm:block">▲ tank · △ candidate roof · ■ business</p>
-          <div className="mt-2 flex overflow-hidden rounded-lg border border-black/10 dark:border-white/15">
-            {(["town", "city"] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                className={`flex-1 px-2 py-1 ${view === v ? "bg-brand text-white" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
-              >
-                {v === "town" ? "Town area" : "Whole city"}
-              </button>
-            ))}
-          </div>
+          </select>
         </div>
-      </section>
-
-      <aside className="min-h-0 flex-1 overflow-y-auto border-t border-black/10 bg-white p-4 lg:w-[400px] lg:flex-none lg:border-t-0 lg:border-l dark:border-white/10 dark:bg-zinc-950">
-        <div key={site ? `s${site.id}` : selected ? `b${selected.id}` : "city"} className="panel-in">
-        {!list ? (
-          <p className="text-sm text-zinc-500">Loading barangays…</p>
-        ) : site ? (
-          <SitePanel site={site} matches={matches} rules={rules} barangayName={selected?.name} onBack={() => setSite(null)} />
-        ) : selected ? (
-          <BarangayPanel
-            barangay={selected}
-            detail={detail?.barangay.id === selected.id ? detail : null}
-            outage={showOutage ? (outageById.get(selected.id) ?? null) : null}
-            scenarioName={showOutage ? (scenario?.name ?? null) : null}
-            sitesById={sitesById}
-            onSelectSite={selectSite}
-            onClose={clearSelection}
-          />
-        ) : (
-          <CityOverview list={list} run={showOutage ? run : null} />
+        {list && (
+          <>
+            <button
+              onClick={() => setSummaryOpen((v) => !v)}
+              aria-expanded={summaryOpen}
+              className="mt-2 flex w-full items-center justify-between rounded-lg px-1 py-0.5 text-xs font-bold text-muted lg:hidden"
+            >
+              {list.lgu.name} summary <span aria-hidden>{summaryOpen ? "▴" : "▾"}</span>
+            </button>
+            <div className={`${summaryOpen ? "block" : "hidden"} lg:block`}>
+              <CitySummary list={list} run={showOutage ? run : null} />
+            </div>
+          </>
         )}
+      </div>
+
+      {/* Legend + view switch (hidden on phones while the details sheet is open) */}
+      <div className={`glass absolute bottom-6 left-3 z-[1000] rounded-2xl p-2 text-xs sm:p-3 ${panelOpen ? "hidden lg:block" : ""}`}>
+        <p className="mb-1.5 hidden font-bold sm:block">{showOutage ? `${scenario?.name ?? "Outage"}` : "Days of stored water"}</p>
+        <ul className="flex gap-3 sm:block sm:space-y-1">
+          {(showOutage
+            ? (["holds", "partial", "fails"] as const).map((o) => ({ color: STATUS[OUTCOME[o].status].color, label: OUTCOME[o].label }))
+            : (["green", "amber", "red"] as const).map((st) => ({ color: STATUS[st].color, label: STATUS[st].label }))
+          ).map((row) => (
+            <li key={row.label} className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: row.color }} />
+              {row.label}
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2 hidden text-[#5f6869] sm:block">▲ tank · △ candidate roof · ■ business</p>
+        <div className="mt-2 flex overflow-hidden rounded-lg border border-black/10">
+          {(["town", "city"] as const).map((v) => (
+            <button key={v} onClick={() => setView(v)} className={`flex-1 px-2 py-1 ${view === v ? "bg-brand text-white" : "bg-white/60 hover:bg-white"}`}>
+              {v === "town" ? "Town area" : "Whole city"}
+            </button>
+          ))}
         </div>
-      </aside>
+      </div>
+
+      {/* Details: only while a barangay or building is selected */}
+      {panelOpen && list && (
+        <aside
+          key={site ? `s${site.id}` : `b${selected?.id}`}
+          aria-label="Selected barangay details"
+          className="glass drawer-in absolute inset-x-0 bottom-0 z-[1100] max-h-[62%] overflow-y-auto rounded-t-3xl p-4 lg:inset-x-auto lg:top-3 lg:right-3 lg:bottom-3 lg:max-h-none lg:w-[400px] lg:rounded-3xl"
+        >
+          <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-black/15 lg:hidden" aria-hidden />
+          {site ? (
+            <SitePanel site={site} matches={matches} rules={rules} barangayName={selected?.name} onBack={() => setSite(null)} />
+          ) : selected ? (
+            <BarangayPanel
+              barangay={selected}
+              detail={detail?.barangay.id === selected.id ? detail : null}
+              outage={showOutage ? (outageById.get(selected.id) ?? null) : null}
+              scenarioName={showOutage ? (scenario?.name ?? null) : null}
+              sitesById={sitesById}
+              onSelectSite={selectSite}
+              onClose={clearSelection}
+            />
+          ) : null}
+        </aside>
+      )}
     </div>
   );
 }
 
-function CityOverview({ list, run }: { list: BarangayList; run: OutageRun | null }) {
+function CitySummary({ list, run }: { list: BarangayList; run: OutageRun | null }) {
   const t = list.totals;
-  const reusable = list.barangays.reduce((s, b) => s + b.metrics.greywater_lpd, 0);
-  const reused = list.barangays.reduce((s, b) => s + (b.metrics.greywater_lpd - b.metrics.reuse_gap_lpd), 0);
+  const reusable = list.barangays.reduce((sum, b) => sum + b.metrics.greywater_lpd, 0);
+  const reused = list.barangays.reduce((sum, b) => sum + (b.metrics.greywater_lpd - b.metrics.reuse_gap_lpd), 0);
+  const tiles = run
+    ? ([
+        ["green", run.summary.holds, "hold out"],
+        ["amber", run.summary.partial, "partly"],
+        ["red", run.summary.fails, "run out"],
+      ] as const)
+    : ([
+        ["green", t.status_counts.green, STATUS.green.label],
+        ["amber", t.status_counts.amber, STATUS.amber.label],
+        ["red", t.status_counts.red, STATUS.red.label],
+      ] as const);
 
   return (
-    <div>
-      <p className="text-xs uppercase tracking-wide text-zinc-500">{list.lgu.province}</p>
-      <h2 className="text-xl font-semibold">{list.lgu.name}</h2>
-      <p className="mt-1 text-sm text-zinc-500">
-        {num(t.population)} people in {list.barangays.length} barangays <DataTag status="real" />
+    <div className="mt-2.5 border-t border-black/10 px-1 pt-2.5">
+      <p className="text-xs text-[#5f6869]">
+        <strong className="text-foreground">{list.lgu.name}</strong> · {num(t.population)} people · {list.barangays.length} barangays <DataTag status="real" />
       </p>
-
-      <h3 className="mt-5 mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Barangays by days of stored water</h3>
-      <div className="grid grid-cols-3 gap-2 text-center">
-        {(["green", "amber", "red"] as const).map((s) => (
-          <div key={s} className="rounded-lg bg-zinc-50 p-2 dark:bg-zinc-900">
-            <p className="text-2xl font-semibold tabular-nums" style={{ color: STATUS[s].color }}>
-              {t.status_counts[s]}
+      <p className="mt-2 text-[10px] font-extrabold tracking-[0.14em] text-brand">
+        {run ? `${run.scenario.name.toUpperCase()}, ${run.scenario.duration_days} DAYS` : "BARANGAYS BY DAYS OF STORED WATER"}
+      </p>
+      <div className="mt-1.5 grid grid-cols-3 gap-1.5 text-center">
+        {tiles.map(([st, n, label]) => (
+          <div key={st} className="rounded-xl bg-white/70 px-1 py-1.5">
+            <p className="text-lg leading-none font-extrabold tabular-nums" style={{ color: STATUS[st].color }}>
+              {n}
             </p>
-            <StatusPill status={s} />
+            <p className="mt-1 text-[10px] font-semibold text-[#5f6869]">{label}</p>
           </div>
         ))}
       </div>
-
-      <dl className="mt-4 space-y-1 text-sm">
-        <div className="flex justify-between">
-          <dt className="text-zinc-500">Light greywater produced</dt>
-          <dd className="font-medium tabular-nums">{liters(reusable)}/day</dd>
+      <dl className="mt-2 space-y-0.5 text-xs">
+        <div className="flex justify-between gap-2">
+          <dt className="text-[#5f6869]">Light greywater produced</dt>
+          <dd className="font-bold tabular-nums">{liters(reusable)}/day</dd>
         </div>
-        <div className="flex justify-between">
-          <dt className="text-zinc-500">Reused today (estimate)</dt>
-          <dd className="font-medium tabular-nums">{liters(reused)}/day</dd>
+        <div className="flex justify-between gap-2">
+          <dt className="text-[#5f6869]">Reused today (estimate)</dt>
+          <dd className="font-bold tabular-nums">{liters(reused)}/day</dd>
         </div>
-        <div className="flex justify-between">
-          <dt className="text-zinc-500">Stored water, citywide</dt>
-          <dd className="font-medium tabular-nums">
+        <div className="flex justify-between gap-2">
+          <dt className="text-[#5f6869]">Stored water, citywide</dt>
+          <dd className="font-bold tabular-nums">
             {liters(t.storage_liters)} · {days(t.days_of_cover)}
           </dd>
         </div>
       </dl>
-
-      {run && (
-        <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm dark:bg-red-950/40">
-          <strong>{run.scenario.name}</strong> for {run.scenario.duration_days} days: {run.summary.holds} barangays hold out on their own storage,{" "}
-          {run.summary.partial} partly, {run.summary.fails} run out. The 5 pulsing roofs are where one new tank adds the most days.
-        </p>
-      )}
-
-      <p className="mt-6 text-sm text-zinc-500">Click a barangay to see its used water, reuse gap and outage reserve.</p>
-      <p className="mt-2 text-xs text-zinc-400">
-        Population: PSA 2020. Rainfall: Open-Meteo. Storage, adoption and sites are simulated until the pilot replaces them.
-      </p>
+      <p className="mt-2 text-[11px] text-[#5f6869]">{run ? "Pulsing roofs: where one new tank adds the most days. " : ""}Click a barangay for details.</p>
     </div>
   );
 }

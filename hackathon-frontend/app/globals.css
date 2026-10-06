@@ -53,6 +53,46 @@ body {
   }
 }
 
+/* Floating map cards: translucent so the map shows through. */
+.glass {
+  background: rgb(255 255 255 / 0.72);
+  border: 1px solid rgb(255 255 255 / 0.65);
+  box-shadow: 0 6px 24px rgb(23 61 66 / 0.16);
+  /* Standard property last: the CSS optimiser keeps only the final one of the pair. */
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+}
+
+/* Leaflet zoom + attribution move clear of the open details panel on laptops. */
+@media (min-width: 1024px) {
+  /* !important: leaflet.css sets right: 0 and is loaded with higher precedence. */
+  .map-panel-open .leaflet-right {
+    right: 412px !important;
+  }
+}
+
+/* Details panel: rises from the bottom on phones, slides in from the right on laptops. */
+.drawer-in {
+  animation: drawer-in-up 0.26s ease-out;
+}
+@keyframes drawer-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+@media (min-width: 1024px) {
+  .drawer-in {
+    animation-name: drawer-in-right;
+  }
+}
+@keyframes drawer-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
 /* Side panel content fades in when the selection changes. */
 .panel-in {
   animation: panel-in 0.22s ease-out;
@@ -67,7 +107,8 @@ body {
   .barangay-shape {
     transition: none;
   }
-  .panel-in {
+  .panel-in,
+  .drawer-in {
     animation: none;
   }
 }
