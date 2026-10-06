@@ -76,6 +76,8 @@ compares the scenario with and without the program.
 ## `/storage`: Storage Registry
 
 ```
+ Built: totals (storage + days, tanks working, drums + drums still needed, forms this quarter), search,
+ status filter, sortable columns, table on desktop / cards on phones, CSV export for the quarterly summary.
  Totals: N tanks · N drums · 1.6M L · 0.4 days citywide                  [simulated]
  ┌───────────────┬───────┬────────┬───────────┬────────┬────────────┬───────────┐
  │ Barangay  ↕   │ Tanks │ Drums  │ Storage L │ Days ↕ │ Drums/hh   │ Last form │
