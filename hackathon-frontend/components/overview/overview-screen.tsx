@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { endpoints } from "@/lib/api";
+import { useAuthUser } from "@/lib/auth";
 import { days, liters, num, STATUS } from "@/lib/format";
 import type { BarangaySummary, Rainfall, StorageRegistry } from "@/lib/types";
 import { useLguData } from "@/lib/use-lgu-data";
@@ -26,6 +27,11 @@ const TONE: Record<Tone, { icon: string; badge: string }> = {
   amber: { icon: "bg-[#faf1e3] text-[#bd7d29]", badge: "bg-[#f9ecd7] text-[#a96b1d]" },
 };
 
+function quarterLabel() {
+  const d = new Date();
+  return `${d.getFullYear()} Q${Math.floor(d.getMonth() / 3) + 1}`;
+}
+
 function inCurrentQuarter(iso: string | null) {
   if (!iso) return false;
   const d = new Date(iso);
@@ -36,6 +42,9 @@ function inCurrentQuarter(iso: string | null) {
 export function OverviewScreen() {
   const router = useRouter();
   const { data, error } = useLguData();
+  const user = useAuthUser();
+  const isStaff = user?.role === "planner" || user?.role === "cdrrmo";
+  const myBarangay = user?.barangay_id && data ? (data.list.barangays.find((b) => b.id === user.barangay_id) ?? null) : null;
   const [rain, setRain] = useState<Rainfall | null>(null);
   const [registry, setRegistry] = useState<StorageRegistry | null>(null);
 
@@ -69,6 +78,19 @@ export function OverviewScreen() {
     const { barangays } = data.list;
     const list: { tone: Tone; icon: IconName; tag: string; title: string; detail: string; href: string }[] = [];
 
+    if (myBarangay) {
+      const row = registry?.rows.find((r) => r.barangay_id === myBarangay.id);
+      const filed = row ? inCurrentQuarter(row.last_form_at) : false;
+      list.push({
+        tone: filed ? "green" : "amber",
+        icon: "clipboard",
+        tag: "YOUR BARANGAY",
+        title: `${myBarangay.name}: ${days(myBarangay.metrics.days_of_cover)} of stored water, readiness ${myBarangay.metrics.readiness_score}/100`,
+        detail: filed ? `Your ${quarterLabel()} form is in.` : `Your ${quarterLabel()} form isn't in yet. Filing it adds 20 readiness points.`,
+        href: "/form",
+      });
+    }
+
     const smallRed = barangays.filter((b) => b.metrics.status === "red").sort((a, b) => a.population - b.population)[0];
     if (smallRed) {
       list.push({
@@ -76,8 +98,10 @@ export function OverviewScreen() {
         icon: "storm",
         tag: "OUTAGE RISK",
         title: `${smallRed.name} runs out in under a day`,
-        detail: `${days(smallRed.metrics.days_of_cover)} of stored water. Try tanks and drum covers in the Program Designer.`,
-        href: "/designer",
+        detail: user
+          ? `${days(smallRed.metrics.days_of_cover)} of stored water. Try tanks and drum covers in the Program Designer.`
+          : `${days(smallRed.metrics.days_of_cover)} of stored water. Outage Mode on the Reuse Map shows what a 3-day outage does.`,
+        href: user ? "/designer" : "/map",
       });
     }
 
@@ -88,10 +112,15 @@ export function OverviewScreen() {
         icon: "people",
         tag: "ADOPTION GAP",
         title: `${biggestGap.name}: ${liters(biggestGap.metrics.reuse_gap_lpd)} of greywater a day unused`,
-        detail: `${Math.round(biggestGap.metrics.adoption_rate * 100)}% of households reuse today. Schedule the next health-worker round.`,
+        detail: user
+          ? `${Math.round(biggestGap.metrics.adoption_rate * 100)}% of households reuse today. Schedule the next health-worker round.`
+          : `${Math.round(biggestGap.metrics.adoption_rate * 100)}% of households reuse today. The Household Guide shows how to reuse safely.`,
         href: "/map",
       });
     }
+
+    // Operational items are for signed-in staff only.
+    if (!user) return list;
 
     const broken = data.sites.filter((s) => s.tank.status === "installed" && s.tank.working === false);
     if (broken.length) {
@@ -117,26 +146,45 @@ export function OverviewScreen() {
       });
     }
     return list;
-  }, [data, registry]);
+  }, [data, registry, user, myBarangay]);
 
   return (
     <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-8 sm:py-8">
       {/* Hero */}
       <section className="relative grid overflow-hidden rounded-2xl border border-line bg-[linear-gradient(105deg,#ffffff_0%,#ffffff_53%,#eef9f9_100%)] shadow-[0_2px_7px_rgba(25,66,70,.08)] md:grid-cols-[1.1fr_.9fr]">
         <div className="relative z-10 px-6 py-8 sm:px-10 sm:py-11">
-          <p className="text-[11px] font-extrabold tracking-[0.18em] text-brand">{data ? `${data.list.lgu.name.toUpperCase()} · PLANNING PORTAL` : "PLANNING PORTAL"}</p>
+          <p className="text-[11px] font-extrabold tracking-[0.18em] text-brand">{user ? `WELCOME BACK, ${user.name.toUpperCase()}` : `${(data?.list.lgu.name ?? "Catbalogan City").toUpperCase()} · PUBLIC VIEW`}</p>
           <h1 className="mt-3 text-4xl leading-[1.05] font-extrabold tracking-[-0.035em] sm:text-5xl">
             Every drop gets
             <br />
             <em className="text-brand not-italic">a second purpose.</em>
           </h1>
           <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[#687274]">
-            Plan safe reuse, strengthen local storage, and prepare every barangay for the next water interruption.
+            {isStaff
+              ? "Your planning tools are ready: price a program, track stored water, and run outage scenarios before typhoon season."
+              : user
+                ? `File ${myBarangay ? `Brgy. ${myBarangay.name}'s` : "your barangay's"} quarterly form, even offline, and see how its readiness compares across the city.`
+                : "Plan safe reuse, strengthen local storage, and prepare every barangay for the next water interruption. Anyone can explore the map and the household guide."}
           </p>
           <div className="mt-6 flex flex-wrap gap-2.5">
             <Link href="/map" className="inline-flex min-h-10 items-center gap-2 rounded-full bg-brand px-5 text-sm font-extrabold text-white transition hover:-translate-y-px hover:bg-brand-dark">
               <Icon name="map" size={17} /> Open Reuse Map
             </Link>
+            {(() => {
+              const second = isStaff
+                ? { href: "/designer", icon: "sliders" as const, label: "Open Program Designer" }
+                : user
+                  ? { href: "/form", icon: "clipboard" as const, label: `File ${quarterLabel()} form` }
+                  : { href: "/login", icon: "people" as const, label: "Staff sign in" };
+              return (
+                <Link
+                  href={second.href}
+                  className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#cbd2d3] bg-white px-5 text-sm font-extrabold transition hover:-translate-y-px"
+                >
+                  <Icon name={second.icon} size={17} /> {second.label}
+                </Link>
+              );
+            })()}
           </div>
         </div>
         <div className="relative hidden min-h-[300px] place-items-center md:grid" aria-hidden="true">
@@ -211,7 +259,11 @@ export function OverviewScreen() {
         </div>
 
         <aside>
-          <SectionTitle eyebrow="PRIORITIES" title="Action queue" aside={actions.length ? <span className={`rounded-xl px-2 py-0.5 text-[10px] font-extrabold ${TONE.violet.badge}`}>{actions.length} OPEN</span> : null} />
+          <SectionTitle
+            eyebrow={user ? "PRIORITIES" : "HIGHLIGHTS"}
+            title={user ? "Action queue" : "What the data shows"}
+            aside={user && actions.length ? <span className={`rounded-xl px-2 py-0.5 text-[10px] font-extrabold ${TONE.violet.badge}`}>{actions.length} OPEN</span> : null}
+          />
           <div className="divide-y divide-[#e7eaea] rounded-2xl border border-[#dde2e3] bg-white shadow-[0_2px_5px_rgba(27,56,58,.07)]">
             {actions.length === 0 && <p className="p-4 text-sm text-muted">Loading…</p>}
             {actions.map((a) => (
@@ -228,6 +280,22 @@ export function OverviewScreen() {
               </Link>
             ))}
           </div>
+          {!user && (
+            <div className="mt-3 rounded-2xl bg-[#eff7f7] p-4">
+              <strong className="block text-sm">Planning tools for LGU and barangay staff</strong>
+              <p className="mt-1 text-xs leading-relaxed text-[#6e7c7e]">
+                The Program Designer, Storage Registry and Barangay Form open after sign-in. Households don&apos;t need an account.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link href="/login" className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-extrabold text-white hover:bg-brand-dark">
+                  Sign in <Icon name="chevron" size={14} />
+                </Link>
+                <Link href="/guide" className="inline-flex min-h-9 items-center rounded-full border border-[#cbd2d3] bg-white px-4 text-xs font-extrabold">
+                  Household guide
+                </Link>
+              </div>
+            </div>
+          )}
         </aside>
       </div>
     </div>

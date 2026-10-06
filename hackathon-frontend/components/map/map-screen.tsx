@@ -9,6 +9,7 @@ import type { BarangayDetail, BarangayList, BarangaySummary, OutageRun, Site, Si
 import { useLguData } from "@/lib/use-lgu-data";
 import type { MapView } from "./barangay-map";
 import { BarangayPanel } from "./barangay-panel";
+import { DetailsSheet } from "./details-sheet";
 import { SitePanel } from "./site-panel";
 import { DataTag } from "./ui";
 
@@ -243,12 +244,7 @@ export function MapScreen() {
 
       {/* Details: only while a barangay or building is selected */}
       {panelOpen && list && (
-        <aside
-          key={site ? `s${site.id}` : `b${selected?.id}`}
-          aria-label="Selected barangay details"
-          className="glass drawer-in absolute inset-x-0 bottom-0 z-[1100] max-h-[62%] overflow-y-auto rounded-t-3xl p-4 lg:inset-x-auto lg:top-3 lg:right-3 lg:bottom-3 lg:max-h-none lg:w-[400px] lg:rounded-3xl"
-        >
-          <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-black/15 lg:hidden" aria-hidden />
+        <DetailsSheet key={`b${selected?.id}`} label="Selected barangay details" onClose={clearSelection}>
           {site ? (
             <SitePanel site={site} matches={matches} rules={rules} barangayName={selected?.name} onBack={() => setSite(null)} />
           ) : selected ? (
@@ -262,7 +258,7 @@ export function MapScreen() {
               onClose={clearSelection}
             />
           ) : null}
-        </aside>
+        </DetailsSheet>
       )}
     </div>
   );
