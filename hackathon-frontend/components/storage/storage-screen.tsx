@@ -5,7 +5,7 @@ import { endpoints } from "@/lib/api";
 import { days, liters, num, STATUS } from "@/lib/format";
 import type { Status, StorageRegistry } from "@/lib/types";
 import { useLguData } from "@/lib/use-lgu-data";
-import { DataTag, StatusPill } from "../map/ui";
+import { DataTag } from "../map/ui";
 
 type Row = StorageRegistry["rows"][number] & {
   status: Status;
@@ -114,182 +114,223 @@ export function StorageScreen() {
 
   const t = registry.totals;
   const tanksWorking = rows.reduce((s, r) => s + r.public_tanks.working, 0);
+  const tanksBroken = t.public_tanks - tanksWorking;
   const totalShort = rows.reduce((s, r) => s + r.drumsShort, 0);
   const formsIn = rows.filter((r) => r.formThisQuarter).length;
 
-  const sortBy = (key: SortKey) => setSort((s) => ({ key, dir: s.key === key ? (s.dir === 1 ? -1 : 1) : key === "name" ? 1 : key === "days" ? 1 : -1 }));
-  const arrow = (key: SortKey) => (sort.key === key ? (sort.dir === 1 ? " ↑" : " ↓") : "");
-
   return (
-    <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+    <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-5 sm:px-6">
+      {/* Headline: the answer first */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="max-w-2xl">
           <p className="text-[10px] font-extrabold tracking-[0.18em] text-brand">DISTRIBUTED RESERVE</p>
           <h1 className="text-2xl font-extrabold tracking-[-0.03em]">Storage Registry</h1>
-          <p className="text-sm text-zinc-500">
-            Covered rain storage per barangay against the {target}-day target ({perHouseholdTarget} drums of {drumLiters} L per household). <DataTag status="simulated" />
+          <p className="mt-2 text-[15px] leading-relaxed">
+            <strong className="font-extrabold" style={{ color: STATUS.green.color }}>
+              {counts.green} of {rows.length}
+            </strong>{" "}
+            barangays can keep toilets and cleaning running for {target} days if the water stops. Citywide, stored water lasts about{" "}
+            <strong className="font-extrabold">{days(t.days_of_cover)}</strong>. <DataTag status="simulated" />
           </p>
         </div>
         <button
           onClick={() => downloadCsv(visible, data.list.lgu.name)}
-          className="rounded-lg border border-brand/40 px-3 py-1.5 text-sm font-medium text-brand hover:bg-brand/10 dark:text-aqua"
+          className="rounded-full border border-brand/40 px-4 py-2 text-sm font-bold text-brand hover:bg-brand/10"
         >
           ⬇ Export CSV
         </button>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Total label="Stored water, citywide" value={liters(t.storage_liters)} sub={`${days(t.days_of_cover)} of non-potable demand`} />
-        <Total label="Public rain tanks" value={`${tanksWorking} of ${t.public_tanks} working`} sub="City engineering records" />
-        <Total label="Covered household drums" value={num(t.covered_drums)} sub={`${num(totalShort)} more needed for ${target} days`} />
-        <Total label="Forms this quarter" value={`${formsIn} of ${rows.length}`} sub="Barangays reporting" />
+      {/* At a glance: one bar, three groups, click to filter */}
+      <section className="mt-5 rounded-2xl border border-[#dde2e3] bg-white p-4 shadow-[0_2px_5px_rgba(27,56,58,.07)]">
+        <div className="flex items-baseline justify-between gap-2">
+          <h2 className="text-sm font-extrabold">Barangays at a glance</h2>
+          <span className="text-xs text-muted">Click a group to list it</span>
+        </div>
+        <div className="mt-3 flex h-9 w-full overflow-hidden rounded-xl" role="group" aria-label="Barangays by readiness">
+          {GROUPS.map((g) =>
+            counts[g.status] === 0 ? null : (
+              <button
+                key={g.status}
+                onClick={() => setFilter(filter === g.status ? "all" : g.status)}
+                aria-pressed={filter === g.status}
+                className={`flex items-center justify-center text-sm font-extrabold text-white transition ${filter !== "all" && filter !== g.status ? "opacity-35" : ""}`}
+                style={{ width: `${(counts[g.status] / rows.length) * 100}%`, backgroundColor: STATUS[g.status].color }}
+                title={`${g.label}: ${counts[g.status]}`}
+              >
+                {counts[g.status]}
+              </button>
+            ),
+          )}
+        </div>
+        <ul className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
+          {GROUPS.map((g) => (
+            <li key={g.status} className="flex items-start gap-2">
+              <span className="mt-0.5 h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: STATUS[g.status].color }} />
+              <span>
+                <strong className="font-extrabold">
+                  {g.label} ({counts[g.status]})
+                </strong>
+                <span className="block text-muted">{g.hint(target)}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Key numbers in plain words */}
+      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Total label="Stored water" value={liters(t.storage_liters)} sub={`about ${days(t.days_of_cover)} for the whole city`} />
+        <Total label="Covered rain drums" value={num(t.covered_drums)} sub={`${num(totalShort)} more needed for ${target} days`} />
+        <Total
+          label="Public rain tanks"
+          value={`${tanksWorking} of ${t.public_tanks} working`}
+          sub={tanksBroken > 0 ? `${tanksBroken} needs repair` : "all working"}
+          warn={tanksBroken > 0}
+        />
+        <Total label="Forms this quarter" value={`${formsIn} of ${rows.length}`} sub={`${rows.length - formsIn} barangays still to report`} warn={formsIn < rows.length} />
       </div>
 
+      <details className="mt-3 rounded-xl bg-[#eff7f7] px-4 py-3 text-sm">
+        <summary className="cursor-pointer font-bold text-brand">How to read this</summary>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-[#4f5a5c]">
+          <li>
+            <strong>Days of cover</strong> = stored water ÷ what the barangay uses each day for flushing and laundry (about 34 L a person).
+          </li>
+          <li>
+            The target is <strong>{target} days</strong>: about {perHouseholdTarget} covered {drumLiters} L drums per household.
+          </li>
+          <li>Only covered drums with rainwater and working public tanks count. Tap water stored before a typhoon is kept separately.</li>
+          <li>Drum counts come from each barangay&apos;s quarterly form. They are estimates, not a household list.</li>
+        </ul>
+      </details>
+
+      {/* Controls */}
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search barangay…"
-          className="w-full rounded-lg border border-black/15 bg-transparent px-3 py-1.5 text-sm sm:w-64 dark:border-white/15"
+          className="w-full rounded-full border border-black/15 bg-white px-4 py-2 text-sm sm:w-64"
           aria-label="Search barangay"
         />
-        {(["all", "red", "amber", "green"] as const).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${filter === f ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900" : "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"}`}
-          >
-            {f === "all" ? `All ${rows.length}` : `${STATUS[f].label} (${counts[f]})`}
+        <select
+          value={`${sort.key}:${sort.dir}`}
+          onChange={(e) => {
+            const [key, dir] = e.target.value.split(":");
+            setSort({ key: key as SortKey, dir: Number(dir) as 1 | -1 });
+          }}
+          className="rounded-full border border-black/15 bg-white px-3 py-2 text-sm"
+          aria-label="Sort"
+        >
+          <option value="days:1">Needs help first</option>
+          <option value="short:-1">Most drums needed</option>
+          <option value="storage:-1">Most water stored</option>
+          <option value="name:1">A to Z</option>
+        </select>
+        {filter !== "all" && (
+          <button onClick={() => setFilter("all")} className="rounded-full bg-zinc-900 px-3 py-2 text-xs font-bold text-white">
+            {GROUPS.find((g) => g.status === filter)?.label} only ✕
           </button>
-        ))}
+        )}
+        <span className="ml-auto text-xs text-muted">
+          Showing {visible.length} of {rows.length}
+        </span>
       </div>
 
-      {/* Wide screens: table */}
-      <div className="mt-3 hidden overflow-hidden rounded-xl border border-black/10 md:block dark:border-white/10">
-        <table className="w-full text-sm">
-          <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500 dark:bg-zinc-900">
-            <tr>
-              <Th onClick={() => sortBy("name")}>Barangay{arrow("name")}</Th>
-              <th className="px-3 py-2 text-right font-semibold">Public tanks</th>
-              <th className="px-3 py-2 text-right font-semibold">Covered drums</th>
-              <Th onClick={() => sortBy("storage")} right>
-                Storage{arrow("storage")}
-              </Th>
-              <Th onClick={() => sortBy("days")}>Days of cover{arrow("days")}</Th>
-              <Th onClick={() => sortBy("short")} right>
-                Drums short{arrow("short")}
-              </Th>
-              <th className="px-3 py-2 font-semibold">Last form</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-black/5 dark:divide-white/10">
-            {visible.map((r) => (
-              <tr key={r.barangay_id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/60">
-                <td className="px-3 py-2 font-medium">{r.name}</td>
-                <td className="px-3 py-2 text-right tabular-nums">
-                  {r.public_tanks.count === 0 ? (
-                    <span className="text-zinc-400">–</span>
-                  ) : (
-                    <>
-                      {r.public_tanks.working}/{r.public_tanks.count}
-                      {r.public_tanks.working < r.public_tanks.count && <span className="ml-1 text-xs text-red-600">needs repair</span>}
-                    </>
-                  )}
-                </td>
-                <td className="px-3 py-2 text-right tabular-nums">
-                  {num(r.covered_drums)}
-                  <span className="block text-xs text-zinc-500">{r.drumsPerHousehold.toFixed(1)} per household</span>
-                </td>
-                <td className="px-3 py-2 text-right tabular-nums">{liters(r.storage_liters)}</td>
-                <td className="px-3 py-2">
-                  <DaysBar days={r.days_of_cover} target={target} status={r.status} />
-                </td>
-                <td className="px-3 py-2 text-right tabular-nums">{r.drumsShort === 0 ? <span className="text-emerald-700 dark:text-emerald-400">Met</span> : num(r.drumsShort)}</td>
-                <td className="px-3 py-2 text-xs">
-                  <FormDate iso={r.last_form_at} current={r.formThisQuarter} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {visible.length === 0 && <p className="p-4 text-sm text-zinc-500">No barangays match.</p>}
-      </div>
-
-      {/* Phones: cards */}
-      <ul className="mt-3 space-y-2 md:hidden">
+      {/* One row per barangay */}
+      <ul className="mt-3 divide-y divide-[#e7eaea] overflow-hidden rounded-2xl border border-[#dde2e3] bg-white shadow-[0_2px_5px_rgba(27,56,58,.07)]">
         {visible.map((r) => (
-          <li key={r.barangay_id} className="rounded-xl border border-black/10 p-3 text-sm dark:border-white/10">
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-semibold">{r.name}</span>
-              <StatusPill status={r.status} label={days(r.days_of_cover)} />
+          <li
+            key={r.barangay_id}
+            className="grid gap-x-5 gap-y-2 border-l-4 px-4 py-3 md:grid-cols-[minmax(150px,1fr)_minmax(200px,1.4fr)_minmax(170px,1fr)] md:items-center"
+            style={{ borderLeftColor: STATUS[r.status].color }}
+          >
+            <div className="min-w-0">
+              <p className="truncate font-extrabold">{r.name}</p>
+              <p className="text-xs text-muted">{num(r.households)} households</p>
             </div>
-            <div className="mt-2">
-              <DaysBar days={r.days_of_cover} target={target} status={r.status} compact />
+
+            <div>
+              <div className="flex items-baseline justify-between text-xs">
+                <span>
+                  <strong className="text-base font-extrabold tabular-nums">{r.days_of_cover.toFixed(1)}</strong> of {target} days
+                </span>
+                <span className="text-muted">{liters(r.storage_liters)} stored</span>
+              </div>
+              <DaysBar days={r.days_of_cover} target={target} status={r.status} />
             </div>
-            <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-              <dt className="text-zinc-500">Storage</dt>
-              <dd className="text-right tabular-nums">{liters(r.storage_liters)}</dd>
-              <dt className="text-zinc-500">Covered drums</dt>
-              <dd className="text-right tabular-nums">
-                {num(r.covered_drums)} ({r.drumsPerHousehold.toFixed(1)}/household)
-              </dd>
-              <dt className="text-zinc-500">Public tanks</dt>
-              <dd className="text-right tabular-nums">{r.public_tanks.count ? `${r.public_tanks.working}/${r.public_tanks.count} working` : "–"}</dd>
-              <dt className="text-zinc-500">Drums short of {target} days</dt>
-              <dd className="text-right tabular-nums">{r.drumsShort === 0 ? "Met" : num(r.drumsShort)}</dd>
-              <dt className="text-zinc-500">Last form</dt>
-              <dd className="text-right">
-                <FormDate iso={r.last_form_at} current={r.formThisQuarter} />
-              </dd>
-            </dl>
+
+            <div className="text-sm">
+              {r.drumsShort === 0 ? (
+                <p className="font-bold" style={{ color: STATUS.green.color }}>
+                  ✓ Target met
+                </p>
+              ) : (
+                <p>
+                  Needs <strong className="font-extrabold">{num(r.drumsShort)}</strong> more covered drums
+                </p>
+              )}
+              <div className="mt-1 flex flex-wrap gap-1.5 text-[11px] font-semibold">
+                <Chip tone="neutral">
+                  {num(r.covered_drums)} drums ({r.drumsPerHousehold.toFixed(1)} per home)
+                </Chip>
+                {r.public_tanks.count > 0 && (
+                  <Chip tone={r.public_tanks.working < r.public_tanks.count ? "bad" : "neutral"}>
+                    {r.public_tanks.working < r.public_tanks.count
+                      ? `${r.public_tanks.count - r.public_tanks.working} tank needs repair`
+                      : `${r.public_tanks.count} public tank${r.public_tanks.count > 1 ? "s" : ""}`}
+                  </Chip>
+                )}
+                <Chip tone={r.formThisQuarter ? "good" : "warn"}>{r.formThisQuarter ? "✓ Form in" : "No form this quarter"}</Chip>
+              </div>
+            </div>
           </li>
         ))}
-        {visible.length === 0 && <p className="text-sm text-zinc-500">No barangays match.</p>}
+        {visible.length === 0 && <li className="p-4 text-sm text-muted">No barangays match.</li>}
       </ul>
 
-      <p className="mt-4 text-xs text-zinc-500">
-        Storage = working public tanks + covered rain drums × {drumLiters} L, counted full. Days of cover = storage ÷ (population × 34 L of flushing and laundry a day). Drum counts are
-        barangay estimates from the quarterly form; simulated until the pilot.
+      <p className="mt-4 text-xs text-muted">
+        Storage = working public tanks + covered rain drums × {drumLiters} L, counted full. Drum counts are barangay estimates from the quarterly form,
+        simulated until the pilot.
       </p>
     </div>
   );
 }
 
-function Total({ label, value, sub }: { label: string; value: string; sub: string }) {
+const GROUPS: { status: Status; label: string; hint: (target: number) => string }[] = [
+  { status: "red", label: "Needs help", hint: () => "Under 1 day of stored water" },
+  { status: "amber", label: "Getting there", hint: (target) => `1 to ${target} days` },
+  { status: "green", label: "Ready", hint: (target) => `${target}+ days: toilets and cleaning keep running` },
+];
+
+function Total({ label, value, sub, warn }: { label: string; value: string; sub: string; warn?: boolean }) {
   return (
-    <div className="rounded-xl bg-zinc-50 p-3 dark:bg-zinc-900">
-      <p className="text-xs text-zinc-500">{label}</p>
-      <p className="mt-0.5 text-lg font-semibold tabular-nums">{value}</p>
-      <p className="text-xs text-zinc-500">{sub}</p>
+    <div className="rounded-2xl border border-[#dde2e3] bg-white p-3.5 shadow-[0_2px_5px_rgba(27,56,58,.07)]">
+      <p className="text-xs font-bold text-muted">{label}</p>
+      <p className="mt-0.5 text-lg font-extrabold tabular-nums">{value}</p>
+      <p className={`text-xs ${warn ? "font-semibold text-[#a96b1d]" : "text-muted"}`}>{sub}</p>
     </div>
   );
 }
 
-function Th({ children, onClick, right }: { children: React.ReactNode; onClick: () => void; right?: boolean }) {
-  return (
-    <th className={`px-3 py-2 font-semibold ${right ? "text-right" : ""}`}>
-      <button onClick={onClick} className="uppercase tracking-wide hover:text-zinc-900 dark:hover:text-zinc-100">
-        {children}
-      </button>
-    </th>
-  );
+function Chip({ tone, children }: { tone: "good" | "warn" | "bad" | "neutral"; children: React.ReactNode }) {
+  const cls = {
+    good: "bg-[#dff2d8] text-[#3d7f37]",
+    warn: "bg-[#f9ecd7] text-[#94601b]",
+    bad: "bg-red-100 text-red-700",
+    neutral: "bg-[#f1f4f4] text-[#4f5a5c]",
+  }[tone];
+  return <span className={`rounded-full px-2 py-0.5 ${cls}`}>{children}</span>;
 }
 
-function DaysBar({ days: d, target, status, compact }: { days: number; target: number; status: Status; compact?: boolean }) {
+/** Progress toward the target, with a tick at the target. Over-target fills the bar. */
+function DaysBar({ days: d, target, status }: { days: number; target: number; status: Status }) {
   const pct = Math.min(100, (d / target) * 100);
   return (
-    <div className="flex items-center gap-2">
-      <div className={`relative h-2 flex-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800 ${compact ? "" : "min-w-24"}`}>
-        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: STATUS[status].color }} />
-      </div>
-      {!compact && <span className="w-14 text-right text-xs tabular-nums">{d.toFixed(1)} d</span>}
+    <div className="relative mt-1 h-2.5 w-full overflow-hidden rounded-full bg-[#e6ebec]">
+      <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: STATUS[status].color }} />
     </div>
   );
-}
-
-function FormDate({ iso, current }: { iso: string | null; current: boolean }) {
-  if (!iso) return <span className="text-red-600">None</span>;
-  const label = new Date(iso).toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" });
-  return current ? <span className="text-emerald-700 dark:text-emerald-400">✓ {label}</span> : <span className="text-zinc-500">{label}</span>;
 }
