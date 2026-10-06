@@ -8,3 +8,6 @@ build/
 .claude/settings.local.json
 # Env templates are meant to be committed
 !.env.example
+
+# Local Claude Code config
+/.claude/

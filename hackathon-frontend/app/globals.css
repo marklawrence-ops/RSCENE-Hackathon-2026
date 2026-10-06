@@ -22,5 +22,60 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Map pins: ▲ installed tank, △ candidate roof, ■ business. */
+.site-pin-wrap {
+  display: flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+.site-pin {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #0b5d6b;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+}
+.site-pin--tank,
+.site-pin--candidate {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  border: 0;
+}
+.site-pin--tank {
+  background: #0b5d6b;
+}
+.site-pin--candidate {
+  background: #7fd1c7;
+}
+.site-pin--business {
+  border-radius: 2px;
+  background: #6b7280;
+  border-color: #ffffff;
+}
+.site-pin-wrap--selected {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 5px #111827;
+}
+.site-pin-wrap--suggested {
+  animation: pin-pulse 1.4s ease-in-out infinite;
+}
+@keyframes pin-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-pin-wrap--suggested {
+    animation: none;
+    transform: scale(1.4);
+  }
 }

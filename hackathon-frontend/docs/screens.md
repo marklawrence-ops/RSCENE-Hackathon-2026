@@ -32,6 +32,8 @@ Shared shell: top bar `[logo] Water Planner   [LGU ▾ Catbalogan]   Map · Desi
 │                                              │  ▲ Mercedes Brgy Hall  ›      │
 │                                              │  △ Mercedes Elem School ›     │
 └──────────────────────────────────────────────┴───────────────────────────────┘
+Built (v1): circles are teal by share of greywater reused (leads with reuse); Outage Mode switches them to
+red / amber / green by outcome and pulses the 5 roofs where one new tank adds the most days.
 First view: fit `lgu.default_bounds` (mainland town area, 49 of 57 barangays incl. Bangon). A [Whole city] button
 fits every barangay; the side panel and totals stay citywide either way.
 Outage Mode ON: circles recolour by outcome (holds/partial/fails); a strip shows
