@@ -225,6 +225,15 @@ describe('barangay forms', function () {
         $this->actingAs($user)->postJson('/api/v1/barangay-forms', formPayload(5, ['channel' => 'paper']))->assertCreated();
     });
 
+    test('staff cannot file for a barangay in another LGU', function () {
+        $user = User::where('email', 'cdrrmo@demo.test')->firstOrFail();
+        $otherLgu = Lgu::create(['slug' => 'other-town', 'name' => 'Other Town', 'province' => 'Samar', 'latitude' => 11.6, 'longitude' => 125.0, 'settings' => []]);
+        $outside = Barangay::create(['lgu_id' => $otherLgu->id, 'name' => 'Outside', 'population' => 500, 'population_year' => 2020]);
+
+        $this->actingAs($user)->postJson('/api/v1/barangay-forms', formPayload($outside->id, ['channel' => 'paper']))->assertForbidden();
+        expect($outside->forms()->count())->toBe(0);
+    });
+
     test('invalid counts are rejected', function () {
         $user = User::where('email', 'cdrrmo@demo.test')->firstOrFail();
 

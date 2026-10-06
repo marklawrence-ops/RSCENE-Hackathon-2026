@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Barangay;
 use App\Models\BarangayForm;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -30,14 +31,19 @@ class BarangayFormController extends Controller
             'submitted_at' => ['required', 'date'],
         ]);
 
+        // Staff file only for barangays in their own LGU; barangay users only for their own barangay.
+        $barangay = Barangay::query()->whereKey($data['barangay_id'])->firstOrFail();
+        if ($user->lgu_id === null || $barangay->lgu_id !== $user->lgu_id) {
+            abort(403, 'You can only submit forms for barangays in your own LGU.');
+        }
+        if ($user->role === 'barangay' && $user->barangay_id !== $barangay->id) {
+            abort(403, 'You can only submit forms for your own barangay.');
+        }
+
         // Offline queues retry; the same device UUID returns the stored form instead of a duplicate.
         $existing = BarangayForm::where('client_uuid', $data['client_uuid'])->first();
         if ($existing) {
             return response()->json(['form' => self::payload($existing)]);
-        }
-
-        if ($user->role === 'barangay' && $user->barangay_id !== (int) $data['barangay_id']) {
-            abort(403, 'You can only submit forms for your own barangay.');
         }
 
         $form = BarangayForm::create([
