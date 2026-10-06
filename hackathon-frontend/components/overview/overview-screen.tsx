@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -190,8 +191,8 @@ export function OverviewScreen() {
         <div className="relative hidden min-h-[300px] place-items-center md:grid" aria-hidden="true">
           <div className="absolute h-[280px] w-[280px] rounded-full border border-[rgba(27,149,159,.19)]" />
           <div className="absolute h-[205px] w-[205px] rounded-full border border-[rgba(27,149,159,.19)]" />
-          <div className="grid h-[142px] w-[142px] -rotate-6 place-items-center rounded-full bg-[linear-gradient(145deg,#72dce5,#42c1ce)] text-brand-ink shadow-[0_0_0_12px_#e3f7f8]">
-            <Icon name="droplet" size={58} />
+          <div className="grid h-[142px] w-[142px] place-items-center rounded-full bg-white shadow-[0_0_0_12px_#e3f7f8]">
+            <Image src="/logo.png" alt="" width={112} height={112} />
           </div>
           <FloatCard className="top-[22%] left-[6%]" icon="rain" value={rain ? `${num(rain.annual_mm)} mm` : "…"} label="rain, last 12 months" />
           <FloatCard className="right-[6%] bottom-[18%]" icon="tank" value={data ? `${data.sites.length} sites` : "…"} label="buildings & businesses mapped" />

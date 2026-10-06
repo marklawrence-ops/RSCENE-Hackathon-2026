@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,8 +36,8 @@ const BOTTOM_PUBLIC: { href: string; label: string; icon: IconName }[] = [
 export function Logo({ light = false }: { light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-xl border-[3px] border-[#e7f7f8] bg-[linear-gradient(145deg,#d9a3eb,#b86fd0)] text-brand-ink">
-        <Icon name="droplet" size={19} />
+      <div className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-xl border border-[#e2eef0] bg-white">
+        <Image src="/logo.png" alt="" width={36} height={36} preload />
       </div>
       <div className="leading-none">
         <strong className={`block text-xl font-extrabold tracking-tight ${light ? "text-white" : "text-foreground"}`}>agos</strong>

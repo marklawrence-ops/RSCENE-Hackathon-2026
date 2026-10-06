@@ -1,6 +1,6 @@
 // Minimal service worker: makes the app shell load offline.
 // API calls are never cached here; the offline barangay form queues in IndexedDB in app code and syncs when back online.
-const VERSION = "v4";
+const VERSION = "v5";
 const SHELL_CACHE = `shell-${VERSION}`;
 const STATIC_CACHE = `static-${VERSION}`;
 // /form and /guide are precached so field staff can open them offline after any first visit.
