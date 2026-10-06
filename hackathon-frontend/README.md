@@ -30,7 +30,7 @@ Call the API only through `endpoints.*` in [lib/api.ts](lib/api.ts), so switchin
 ## Deploy (Vercel)
 
 1. Push to GitHub, then **vercel.com → Add New → Project** and import the repo (framework auto-detected).
-2. Environment variables (Production and Preview): `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_USE_MOCKS=true`.
+2. Environment variables (Production and Preview): `NEXT_PUBLIC_API_URL`. Leave `NEXT_PUBLIC_USE_MOCKS` unset for live data; set it to `true` only as a fallback if the API is down.
 3. Deploy. `NEXT_PUBLIC_*` values are baked in at build time, so **redeploy after changing them**.
 4. Add the Vercel URL to the backend's `CORS_ALLOWED_ORIGINS`. The home page should then say **Connected**.
 
