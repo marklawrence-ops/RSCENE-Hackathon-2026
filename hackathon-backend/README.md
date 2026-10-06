@@ -18,6 +18,18 @@ php artisan test --compact
 
 Demo accounts (password = `DEMO_USER_PASSWORD`, default `password`): `planner@demo.test`, `cdrrmo@demo.test`, `barangay@demo.test`.
 
+## Loading real buildings and tanks
+
+The seed uses simulated buildings for the demo. To load a real survey (e.g. City Engineering), fill a CSV like `database/data/templates/sites_import_template.csv` and run:
+
+```bash
+php artisan sites:import path/to/survey.csv --dry-run      # check only, saves nothing
+php artisan sites:import path/to/survey.csv                # add or update (matched by barangay + name)
+php artisan sites:import path/to/survey.csv --replace      # also remove SIMULATED sites in the barangays the file covers
+```
+
+Imported rows are marked `real`. A bad row stops the whole import and names the line; a point outside its barangay boundary is a warning. Columns: barangay, name, kind (public_building | business), category, latitude, longitude, roof_area_m2, source_types (rain|light_greywater|wash_water|condensate|kitchen|toilet, pipe-separated), greywater_lpd, nonpotable_demand_lpd, tank_status (none | candidate | installed), tank_liters, tank_covered, tank_working (yes/no).
+
 ## Deploy (Laravel Cloud)
 
 1. Push this repo to GitHub.

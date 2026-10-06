@@ -128,3 +128,5 @@ Public, no sign-in, precached for offline. English / Filipino / Waray switch; Fi
 translations** (banner on the page) until a native speaker reviews `components/guide/guide-content.ts`. Sections: Do this
 (source → use), Never, Rules for rain drums (label "Hindi maiinom / Not for drinking" in every language), Be ready when
 the water stops (3 drums ≈ 3 days for a family of 5). "Print card" hides the app chrome.
+
+Tally mode (Oct 6 night): a switch on /form adds big +1 / −1 buttons for covered drums and reusing households. Numbers stay editable; a draft per barangay + quarter is kept on the phone (localStorage) across visits and cleared when the form is saved.

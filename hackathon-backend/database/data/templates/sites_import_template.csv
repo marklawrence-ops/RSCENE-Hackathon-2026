@@ -1,0 +1,3 @@
+barangay,name,kind,category,latitude,longitude,roof_area_m2,source_types,greywater_lpd,nonpotable_demand_lpd,tank_status,tank_liters,tank_covered,tank_working
+Bangon,Bangon Elementary School,public_building,school,11.875621,124.878409,275,rain|light_greywater|kitchen,140,230,installed,1000,yes,yes
+Bangon,Brgy. Bangon Hall,public_building,barangay_hall,11.875621,124.878409,80,rain|light_greywater,120,200,candidate,,,

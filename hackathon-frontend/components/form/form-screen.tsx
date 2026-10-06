@@ -334,6 +334,37 @@ export default function FormScreen() {
 }
 
 type Values = { tanks_working: string; tanks_total: string; covered_drums: string; reusing_households: string; households_estimate: string };
+
+const EMPTY: Values = { tanks_working: "", tanks_total: "", covered_drums: "", reusing_households: "", households_estimate: "" };
+const draftKey = (barangayId: number | null, period: string) => (barangayId ? `cwnp.draft.${barangayId}.${period}` : null);
+
+function loadDraft(key: string | null): Values {
+  if (!key) return EMPTY;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? { ...EMPTY, ...(JSON.parse(raw) as Partial<Values>) } : EMPTY;
+  } catch {
+    return EMPTY;
+  }
+}
+
+function saveDraft(key: string | null, values: Values) {
+  if (!key) return;
+  try {
+    if (Object.values(values).every((v) => v === "")) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(values));
+  } catch {
+    // Storage blocked: the draft lasts until the page closes.
+  }
+}
+
+function readFlag(key: string): boolean {
+  try {
+    return localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+}
 type Field = keyof Values | "barangay";
 
 // Liters a public tank holds, for the live preview only (the server uses each tank's real size).
@@ -347,8 +378,28 @@ function FormCard({ user, barangays, onQueued }: { user: User; barangays: Cached
   const [barangayId, setBarangayId] = useState<number | null>(user.barangay_id);
   const [period, setPeriod] = useState(currentQuarter());
   const [channel, setChannel] = useState<"app" | "paper">("app");
-  const empty: Values = { tanks_working: "", tanks_total: "", covered_drums: "", reusing_households: "", households_estimate: "" };
-  const [values, setValues] = useState<Values>(empty);
+  const key = draftKey(barangayId, period);
+  const [values, setValues] = useState<Values>(() => loadDraft(key));
+  // Switching barangay or period loads that pair's saved draft (React's "adjust state while rendering" pattern).
+  const [loadedKey, setLoadedKey] = useState(key);
+  if (key !== loadedKey) {
+    setLoadedKey(key);
+    setValues(loadDraft(key));
+  }
+  useEffect(() => saveDraft(key, values), [key, values]);
+  const hasDraft = Object.values(values).some((v) => v !== "");
+
+  // Tally mode: big +1 / −1 buttons for counting during house visits. Remembered on this phone.
+  const [tally, setTally] = useState(() => readFlag("cwnp.tallyMode"));
+  const toggleTally = () =>
+    setTally((t) => {
+      try {
+        localStorage.setItem("cwnp.tallyMode", t ? "0" : "1");
+      } catch {
+        // Not remembered; fine.
+      }
+      return !t;
+    });
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
@@ -417,13 +468,33 @@ function FormCard({ user, barangays, onQueued }: { user: User; barangays: Cached
       queued_at: new Date().toISOString(),
       status: "pending",
     });
-    setValues(empty);
+    saveDraft(key, EMPTY);
+    setValues(EMPTY);
     setNotes("");
     setSaving(false);
   };
 
   return (
     <form onSubmit={submit} noValidate className="space-y-4">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#dde2e3] bg-white px-4 py-3 shadow-[0_2px_5px_rgba(27,56,58,.07)]">
+        <div className="text-sm">
+          <strong className="block font-extrabold">Tally mode</strong>
+          <span className="text-xs text-muted">
+            Count drums and households with +1 as you visit. Counts stay on this phone until you save{hasDraft ? " (counts saved)" : ""}.
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={tally}
+          aria-label="Tally mode"
+          onClick={toggleTally}
+          className={`relative h-7 w-12 shrink-0 rounded-full transition ${tally ? "bg-brand" : "bg-zinc-300"}`}
+        >
+          <span className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${tally ? "translate-x-5" : ""}`} />
+        </button>
+      </div>
+
       <Step n={1} title="Which barangay and period?">
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block text-sm">
@@ -481,6 +552,7 @@ function FormCard({ user, barangays, onQueued }: { user: User; barangays: Cached
 
       <Step n={3} title="How many covered rain drums are there?" hint="Count drums that have a lid and hold rainwater. Don't count open drums or drums of tap water.">
         <BigNumber label="Covered rain drums" value={values.covered_drums} onChange={(v) => setValue("covered_drums", v)} suffix="drums" placeholder="e.g. 140" />
+        {tally && <TallyButtons label="covered drum" onStep={(d) => step("covered_drums", d)} />}
         <FieldError msg={errors.covered_drums} />
       </Step>
 
@@ -493,6 +565,7 @@ function FormCard({ user, barangays, onQueued }: { user: User; barangays: Cached
         {preview && Number(values.reusing_households) > 0 && (
           <p className="mt-1.5 text-xs text-muted">That is {Math.round(preview.reuse * 100)}% of households.</p>
         )}
+        {tally && <TallyButtons label="household reusing" onStep={(d) => step("reusing_households", d)} />}
         <FieldError msg={errors.reusing_households ?? errors.households_estimate} />
         <p className="mt-1 text-xs text-muted">All-households number comes from the census; change it if you know better.</p>
       </Step>
@@ -551,6 +624,29 @@ function Step({ n, title, hint, children }: { n: number; title: string; hint?: s
         </div>
       </div>
     </section>
+  );
+}
+
+/** Big tap targets for counting on the move; the number above stays editable. */
+function TallyButtons({ label, onStep }: { label: string; onStep: (delta: number) => void }) {
+  return (
+    <div className="mt-3 flex gap-2">
+      <button
+        type="button"
+        onClick={() => onStep(-1)}
+        className="h-14 w-16 rounded-2xl border border-black/15 bg-white text-xl font-extrabold text-[#5f6869] active:bg-zinc-100"
+        aria-label={`Remove one ${label}`}
+      >
+        −1
+      </button>
+      <button
+        type="button"
+        onClick={() => onStep(1)}
+        className="h-14 flex-1 rounded-2xl bg-brand text-base font-extrabold text-white shadow-[0_5px_14px_rgba(22,141,152,.2)] active:bg-brand-dark"
+      >
+        +1 {label}
+      </button>
+    </div>
   );
 }
 
