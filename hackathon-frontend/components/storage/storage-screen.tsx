@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { endpoints } from "@/lib/api";
-import { days, liters, num, STATUS } from "@/lib/format";
+import { days, liters, num } from "@/lib/format";
 import type { Status, StorageRegistry } from "@/lib/types";
 import { useLguData } from "@/lib/use-lgu-data";
 import { DataTag } from "../map/ui";
@@ -16,6 +16,13 @@ type Row = StorageRegistry["rows"][number] & {
 };
 
 type SortKey = "name" | "days" | "storage" | "short";
+
+// Gentler than the map's STATUS colours: tint for fills, mid for bars and edges, ink for text on the tint.
+const SOFT: Record<Status, { tint: string; mid: string; ink: string }> = {
+  red: { tint: "#f7dcd9", mid: "#e39b93", ink: "#9b3b33" },
+  amber: { tint: "#f8e8cf", mid: "#e8bd7e", ink: "#8c5a17" },
+  green: { tint: "#dcefd8", mid: "#93c98c", ink: "#3a7a34" },
+};
 
 const statusFor = (d: number, target: number): Status => (d >= target ? "green" : d >= 1 ? "amber" : "red");
 
@@ -126,7 +133,7 @@ export function StorageScreen() {
           <p className="text-[10px] font-extrabold tracking-[0.18em] text-brand">DISTRIBUTED RESERVE</p>
           <h1 className="text-2xl font-extrabold tracking-[-0.03em]">Storage Registry</h1>
           <p className="mt-2 text-[15px] leading-relaxed">
-            <strong className="font-extrabold" style={{ color: STATUS.green.color }}>
+            <strong className="font-extrabold" style={{ color: SOFT.green.ink }}>
               {counts.green} of {rows.length}
             </strong>{" "}
             barangays can keep toilets and cleaning running for {target} days if the water stops. Citywide, stored water lasts about{" "}
@@ -154,8 +161,8 @@ export function StorageScreen() {
                 key={g.status}
                 onClick={() => setFilter(filter === g.status ? "all" : g.status)}
                 aria-pressed={filter === g.status}
-                className={`flex items-center justify-center text-sm font-extrabold text-white transition ${filter !== "all" && filter !== g.status ? "opacity-35" : ""}`}
-                style={{ width: `${(counts[g.status] / rows.length) * 100}%`, backgroundColor: STATUS[g.status].color }}
+                className={`flex items-center justify-center border-r-2 border-white text-sm font-extrabold transition last:border-r-0 ${filter !== "all" && filter !== g.status ? "opacity-40" : ""}`}
+                style={{ width: `${(counts[g.status] / rows.length) * 100}%`, backgroundColor: SOFT[g.status].tint, color: SOFT[g.status].ink }}
                 title={`${g.label}: ${counts[g.status]}`}
               >
                 {counts[g.status]}
@@ -166,7 +173,7 @@ export function StorageScreen() {
         <ul className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
           {GROUPS.map((g) => (
             <li key={g.status} className="flex items-start gap-2">
-              <span className="mt-0.5 h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: STATUS[g.status].color }} />
+              <span className="mt-0.5 h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: SOFT[g.status].mid }} />
               <span>
                 <strong className="font-extrabold">
                   {g.label} ({counts[g.status]})
@@ -244,37 +251,44 @@ export function StorageScreen() {
         {visible.map((r) => (
           <li
             key={r.barangay_id}
-            className="grid gap-x-5 gap-y-2 border-l-4 px-4 py-3 md:grid-cols-[minmax(150px,1fr)_minmax(200px,1.4fr)_minmax(170px,1fr)] md:items-center"
-            style={{ borderLeftColor: STATUS[r.status].color }}
+            className="grid gap-x-6 gap-y-3 border-l-4 px-4 py-3.5 sm:grid-cols-2 lg:grid-cols-[minmax(140px,0.9fr)_minmax(200px,1.3fr)_minmax(160px,1fr)_minmax(190px,1.1fr)] lg:items-start"
+            style={{ borderLeftColor: SOFT[r.status].mid }}
           >
             <div className="min-w-0">
+              <CellLabel>Barangay</CellLabel>
               <p className="truncate font-extrabold">{r.name}</p>
               <p className="text-xs text-muted">{num(r.households)} households</p>
             </div>
 
             <div>
-              <div className="flex items-baseline justify-between text-xs">
+              <CellLabel>Stored water</CellLabel>
+              <div className="flex items-baseline justify-between gap-2 text-xs">
                 <span>
                   <strong className="text-base font-extrabold tabular-nums">{r.days_of_cover.toFixed(1)}</strong> of {target} days
                 </span>
-                <span className="text-muted">{liters(r.storage_liters)} stored</span>
+                <span className="text-muted">{liters(r.storage_liters)}</span>
               </div>
               <DaysBar days={r.days_of_cover} target={target} status={r.status} />
             </div>
 
             <div className="text-sm">
+              <CellLabel>What it needs</CellLabel>
               {r.drumsShort === 0 ? (
-                <p className="font-bold" style={{ color: STATUS.green.color }}>
+                <p className="font-bold" style={{ color: SOFT.green.ink }}>
                   ✓ Target met
                 </p>
               ) : (
                 <p>
-                  Needs <strong className="font-extrabold">{num(r.drumsShort)}</strong> more covered drums
+                  <strong className="font-extrabold">{num(r.drumsShort)}</strong> more covered drums
                 </p>
               )}
-              <div className="mt-1 flex flex-wrap gap-1.5 text-[11px] font-semibold">
+            </div>
+
+            <div>
+              <CellLabel>Details</CellLabel>
+              <div className="flex flex-wrap gap-1.5 text-[11px] font-semibold">
                 <Chip tone="neutral">
-                  {num(r.covered_drums)} drums ({r.drumsPerHousehold.toFixed(1)} per home)
+                  {num(r.covered_drums)} drums · {r.drumsPerHousehold.toFixed(1)} per home
                 </Chip>
                 {r.public_tanks.count > 0 && (
                   <Chip tone={r.public_tanks.working < r.public_tanks.count ? "bad" : "neutral"}>
@@ -305,21 +319,25 @@ const GROUPS: { status: Status; label: string; hint: (target: number) => string 
   { status: "green", label: "Ready", hint: (target) => `${target}+ days: toilets and cleaning keep running` },
 ];
 
+function CellLabel({ children }: { children: React.ReactNode }) {
+  return <p className="mb-0.5 text-[10px] font-extrabold tracking-[0.12em] text-[#8a9496] uppercase">{children}</p>;
+}
+
 function Total({ label, value, sub, warn }: { label: string; value: string; sub: string; warn?: boolean }) {
   return (
     <div className="rounded-2xl border border-[#dde2e3] bg-white p-3.5 shadow-[0_2px_5px_rgba(27,56,58,.07)]">
       <p className="text-xs font-bold text-muted">{label}</p>
       <p className="mt-0.5 text-lg font-extrabold tabular-nums">{value}</p>
-      <p className={`text-xs ${warn ? "font-semibold text-[#a96b1d]" : "text-muted"}`}>{sub}</p>
+      <p className={`text-xs ${warn ? "font-semibold text-[#8c5a17]" : "text-muted"}`}>{sub}</p>
     </div>
   );
 }
 
 function Chip({ tone, children }: { tone: "good" | "warn" | "bad" | "neutral"; children: React.ReactNode }) {
   const cls = {
-    good: "bg-[#dff2d8] text-[#3d7f37]",
-    warn: "bg-[#f9ecd7] text-[#94601b]",
-    bad: "bg-red-100 text-red-700",
+    good: "bg-[#e6f3e3] text-[#3a7a34]",
+    warn: "bg-[#faf0df] text-[#8c5a17]",
+    bad: "bg-[#f9e4e1] text-[#9b3b33]",
     neutral: "bg-[#f1f4f4] text-[#4f5a5c]",
   }[tone];
   return <span className={`rounded-full px-2 py-0.5 ${cls}`}>{children}</span>;
@@ -329,8 +347,8 @@ function Chip({ tone, children }: { tone: "good" | "warn" | "bad" | "neutral"; c
 function DaysBar({ days: d, target, status }: { days: number; target: number; status: Status }) {
   const pct = Math.min(100, (d / target) * 100);
   return (
-    <div className="relative mt-1 h-2.5 w-full overflow-hidden rounded-full bg-[#e6ebec]">
-      <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: STATUS[status].color }} />
+    <div className="relative mt-1.5 h-2 w-full overflow-hidden rounded-full bg-[#eef1f1]">
+      <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: SOFT[status].mid }} />
     </div>
   );
 }
