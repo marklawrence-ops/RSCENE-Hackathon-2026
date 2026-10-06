@@ -6,3 +6,5 @@ __pycache__/
 dist/
 build/
 .claude/settings.local.json
+# Env templates are meant to be committed
+!.env.example
