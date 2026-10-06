@@ -107,4 +107,8 @@ compares the scenario with and without the program.
 │ ✓ 2026-Q3 synced Sep 30   │
 └───────────────────────────┘
 ```
+Built: sign in once online (token + user cached); barangay users are fixed to their barangay, planner/CDRRMO
+pick one and can mark "Encoding a paper form". Barangay list is cached for offline use; /form is precached by
+the service worker. Sync runs on load, on the online event, every 30 s, and via "Sync now"; 4xx answers mark the
+item "Not accepted" with a Discard button, 401 asks to sign in again (queued forms are kept).
 Offline flow: Save → write to IndexedDB with `crypto.randomUUID()` → on `online` event (and on load) POST each queued form → remove on 200/201. Re-sending the same `client_uuid` is safe (the API returns 200 with the existing form).

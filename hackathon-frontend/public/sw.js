@@ -1,9 +1,10 @@
 // Minimal service worker: makes the app shell load offline.
 // API calls are never cached here; the offline barangay form queues in IndexedDB in app code and syncs when back online.
-const VERSION = "v1";
+const VERSION = "v2";
 const SHELL_CACHE = `shell-${VERSION}`;
 const STATIC_CACHE = `static-${VERSION}`;
-const SHELL_URLS = ["/", "/offline.html", "/manifest.webmanifest", "/icons/icon-192.png"];
+// /form is precached so field staff can open it offline after any first visit.
+const SHELL_URLS = ["/", "/form", "/offline.html", "/manifest.webmanifest", "/icons/icon-192.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_URLS)));

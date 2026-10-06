@@ -5,6 +5,7 @@ import Link from "next/link";
 const NAV = [
   { href: "/", label: "Map" },
   { href: "/designer", label: "Designer" },
+  { href: "/form", label: "Form" },
 ];
 
 export function AppHeader() {
