@@ -159,9 +159,40 @@ export function DesignerScreen() {
   const sortedBarangays = [...list.barangays].sort((a, b) => a.name.localeCompare(b.name, "en", { numeric: true }));
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+    <div className="map-panel-open relative flex min-h-0 flex-1 flex-col overflow-y-auto lg:block lg:overflow-hidden">
+      {/* Map: the whole background on laptops, a strip at the top on phones */}
+      <div className="relative h-[42dvh] shrink-0 lg:absolute lg:inset-0 lg:h-auto">
+        <BarangayMap
+          barangays={list.barangays}
+          boundaries={data?.boundaries ?? []}
+          colorFor={colorFor}
+          selectedId={null}
+          onSelect={toggleBarangay}
+          sites={NO_SITES}
+          selectedSiteId={null}
+          onSelectSite={() => {}}
+          suggestedSiteIds={NO_SUGGESTIONS}
+          defaultBounds={list.lgu.default_bounds}
+          view="town"
+        />
+        <div className="glass absolute bottom-6 left-3 z-[1000] rounded-2xl p-2 text-xs lg:left-[388px]">
+          <ul className="flex flex-wrap gap-3">
+            {(["green", "amber", "red"] as const).map((s) => (
+              <li key={s} className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: STATUS[s].color }} />
+                {STATUS[s].label}
+              </li>
+            ))}
+            <li className="flex items-center gap-1.5">
+              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: NOT_IN_PROGRAM }} />
+              Not in program
+            </li>
+          </ul>
+        </div>
+      </div>
+
       {/* Controls */}
-      <section className="shrink-0 border-b border-black/10 bg-white p-4 lg:w-[360px] lg:overflow-y-auto lg:border-r lg:border-b-0 dark:border-white/10 dark:bg-zinc-950">
+      <section className="glass relative z-[1000] mx-3 mt-3 rounded-3xl p-4 lg:absolute lg:top-3 lg:bottom-3 lg:left-3 lg:m-0 lg:w-[360px] lg:overflow-y-auto">
         <div className="flex items-center justify-between gap-2">
           <div>
             <p className="text-[10px] font-extrabold tracking-[0.18em] text-brand">BUDGET &amp; IMPACT</p>
@@ -265,8 +296,8 @@ export function DesignerScreen() {
       </section>
 
       {/* Results */}
-      <section className="flex min-w-0 flex-1 flex-col lg:overflow-y-auto 2xl:flex-row 2xl:overflow-hidden">
-        <div className="shrink-0 space-y-4 p-4 2xl:w-[400px] 2xl:overflow-y-auto">
+      <section className="relative z-[1000] lg:absolute lg:top-3 lg:right-3 lg:bottom-3 lg:w-[400px]">
+        <div className="glass m-3 space-y-4 rounded-3xl p-4 lg:m-0 lg:h-full lg:overflow-y-auto">
           {!preview || targetCount === 0 ? (
             <p className="text-sm text-zinc-500">{targetCount === 0 ? "Add a barangay to start." : "Calculating…"}</p>
           ) : (
@@ -389,36 +420,6 @@ export function DesignerScreen() {
               </p>
             </div>
           )}
-        </div>
-
-        <div className="relative h-[50dvh] shrink-0 border-t border-black/10 lg:h-[420px] 2xl:h-auto 2xl:flex-1 2xl:border-t-0 2xl:border-l">
-          <BarangayMap
-            barangays={list.barangays}
-            boundaries={data?.boundaries ?? []}
-            colorFor={colorFor}
-            selectedId={null}
-            onSelect={toggleBarangay}
-            sites={NO_SITES}
-            selectedSiteId={null}
-            onSelectSite={() => {}}
-            suggestedSiteIds={NO_SUGGESTIONS}
-            defaultBounds={list.lgu.default_bounds}
-            view="town"
-          />
-          <div className="absolute bottom-6 left-3 z-[1000] rounded-xl bg-white/95 p-2 text-xs shadow-md dark:bg-zinc-900/95">
-            <ul className="flex flex-wrap gap-3">
-              {(["green", "amber", "red"] as const).map((s) => (
-                <li key={s} className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-full" style={{ backgroundColor: STATUS[s].color }} />
-                  {STATUS[s].label}
-                </li>
-              ))}
-              <li className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: NOT_IN_PROGRAM }} />
-                Not in program
-              </li>
-            </ul>
-          </div>
         </div>
       </section>
     </div>

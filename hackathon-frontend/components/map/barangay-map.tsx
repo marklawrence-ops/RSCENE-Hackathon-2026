@@ -2,8 +2,8 @@
 
 import "leaflet/dist/leaflet.css";
 import L, { type LatLngBounds, type LatLngExpression } from "leaflet";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { CircleMarker, MapContainer, Marker, Polygon, TileLayer, Tooltip, useMap, useMapEvents, ZoomControl } from "react-leaflet";
+import { useEffect, useMemo, useRef } from "react";
+import { CircleMarker, MapContainer, Marker, Polygon, TileLayer, Tooltip, useMap, ZoomControl } from "react-leaflet";
 import type { BarangaySummary, BoundaryFeature, Site } from "@/lib/types";
 
 export type MapView = "town" | "city";
@@ -65,31 +65,13 @@ function FollowSelection({ bounds }: { bounds: LatLngBounds | null }) {
   return null;
 }
 
-/** Reports the zoom level so pins can thin out when zoomed out. */
-function ZoomWatcher({ onZoom }: { onZoom: (z: number) => void }) {
-  const map = useMapEvents({ zoomend: () => onZoom(map.getZoom()) });
-  useEffect(() => onZoom(map.getZoom()), [map, onZoom]);
-  return null;
-}
-
-// Below this zoom only tanks, suggestions and the selected barangay's sites show.
-const DETAIL_ZOOM = 15;
-
 export default function BarangayMap(props: Props) {
   const { barangays, boundaries, colorFor, selectedId, onSelect, sites, selectedSiteId, onSelectSite, suggestedSiteIds, defaultBounds, view } = props;
 
-  const [zoom, setZoom] = useState(13);
+  // Buildings show only for the selected barangay; with nothing selected the map stays clean.
   const visibleSites = useMemo(
-    () =>
-      sites.filter(
-        (s) =>
-          zoom >= DETAIL_ZOOM ||
-          s.tank.status === "installed" ||
-          s.barangay_id === selectedId ||
-          s.id === selectedSiteId ||
-          suggestedSiteIds.has(s.id),
-      ),
-    [sites, zoom, selectedId, selectedSiteId, suggestedSiteIds],
+    () => (selectedId === null ? [] : sites.filter((s) => s.barangay_id === selectedId || s.id === selectedSiteId)),
+    [sites, selectedId, selectedSiteId],
   );
 
   const shapes = useMemo(() => {
@@ -129,7 +111,6 @@ export default function BarangayMap(props: Props) {
         maxZoom={19}
       />
       <ZoomControl position="bottomright" />
-      <ZoomWatcher onZoom={setZoom} />
       <ViewController bounds={viewBounds} />
       <FollowSelection bounds={selectedBounds} />
 

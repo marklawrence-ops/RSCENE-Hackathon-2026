@@ -314,7 +314,7 @@ function CitySummary({ list, run }: { list: BarangayList; run: OutageRun | null 
           </dd>
         </div>
       </dl>
-      <p className="mt-2 text-[11px] text-[#5f6869]">{run ? "Pulsing roofs: where one new tank adds the most days. " : ""}Click a barangay for details.</p>
+      <p className="mt-2 text-[11px] text-[#5f6869]">{run ? "Select a barangay to see its buildings and the best roof for a new tank." : "Click a barangay for details and its buildings."}</p>
     </div>
   );
 }
