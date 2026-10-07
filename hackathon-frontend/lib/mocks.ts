@@ -224,7 +224,7 @@ function programPreview(input: ProgramInput): ProgramPreview {
       { phase: 1, label: "Pilot, 1 barangay, 6 months", cost_php: cost, tanks, drum_covers: input.drum_covers, cards: input.cards },
       { phase: 2, label: "Citywide year 2", cost_php: { min: 900000, max: 1700000 }, tanks: 56, drum_covers: 0, cards: 0 },
     ],
-    funding_tag: "LDRRMF 70% preparedness share (RA 10121)",
+    funding_tag: "LDRRMF outside the 30% Quick Response Fund (RA 10121)",
     share_of_funding: Math.round((cost.max / 35000000) * 10000) / 10000,
     barangays: rows,
   };

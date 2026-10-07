@@ -70,7 +70,7 @@ class DatabaseSeeder extends Seeder
             // Map opens on the mainland town area (49 of 57 barangays); "Whole city" adds the western islands and Basiao.
             'default_bounds' => [[11.735, 124.815], [11.91, 124.935]],
             'funding' => [
-                'source' => 'LDRRMF 70% preparedness share (RA 10121)',
+                'source' => 'LDRRMF outside the 30% Quick Response Fund (RA 10121)',
                 'preparedness_share_php' => ['min' => 35000000, 'max' => 51000000],
             ],
         ];

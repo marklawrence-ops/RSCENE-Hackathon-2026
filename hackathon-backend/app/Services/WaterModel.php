@@ -358,7 +358,7 @@ class WaterModel
                 ['phase' => 1, 'label' => "Pilot, {$targets->count()} ".Str::plural('barangay', $targets->count()).', 6 months', 'cost_php' => $costPhp, 'tanks' => $tanks, 'drum_covers' => $input['drum_covers'], 'cards' => $input['cards']],
                 ['phase' => 2, 'label' => 'Citywide rollout, per year (years 2–3)', 'cost_php' => ['min' => (int) $rollout['min'], 'max' => (int) $rollout['max']], 'tanks' => 2 * $barangays->count(), 'drum_covers' => 0, 'cards' => 0],
             ],
-            'funding_tag' => (string) ($funding['source'] ?? 'LDRRMF 70% preparedness share (RA 10121)'),
+            'funding_tag' => (string) ($funding['source'] ?? 'LDRRMF outside the 30% Quick Response Fund (RA 10121)'),
             'share_of_funding' => round($costPhp['max'] / max((float) $share['min'], 1), 4),
             'barangays' => $rows->all(),
         ];

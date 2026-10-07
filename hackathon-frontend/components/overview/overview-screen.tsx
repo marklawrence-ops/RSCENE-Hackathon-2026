@@ -318,7 +318,7 @@ function HowItWorks({ isStaff }: { isStaff: boolean }) {
     {
       n: "2",
       title: "Price what closes the gap",
-      text: "Tanks, drum covers and guidance cards, with the cost, days of cover gained and share of the disaster fund.",
+      text: "Tanks, drum covers and guidance cards, with the cost, days of cover gained and share of the city disaster fund (LDRRMF).",
       href: isStaff ? "/designer" : "/map?outage=1",
       link: isStaff ? "Program Designer" : "Outage Mode",
     },

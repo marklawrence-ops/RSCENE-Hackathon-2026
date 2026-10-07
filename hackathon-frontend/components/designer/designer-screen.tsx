@@ -312,6 +312,7 @@ export function DesignerScreen() {
                 <p className="mt-1 text-sm text-white/80">
                   {(preview.share_of_funding * 100).toFixed(2)}% of the {preview.funding_tag}
                 </p>
+                <p className="mt-0.5 text-[11px] text-white/70">A possible funding route: needs the local DRRM plan and budget approval.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
