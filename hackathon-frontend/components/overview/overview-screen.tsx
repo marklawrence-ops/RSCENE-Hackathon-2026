@@ -199,6 +199,8 @@ export function OverviewScreen() {
         </div>
       </section>
 
+      <HowItWorks isStaff={isStaff} />
+
       {/* Stats */}
       <SectionTitle eyebrow="NETWORK PULSE" title="Today at a glance" aside={<span className="text-xs text-muted">Live from the API · storage and adoption simulated</span>} />
       {error && !data ? (
@@ -206,7 +208,7 @@ export function OverviewScreen() {
       ) : (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatCard icon="droplet" tone="cyan" label="Reuse potential" value={stats ? liters(stats.greywater) : "…"} detail="light greywater every day" />
-          <StatCard icon="storage" tone="cyan" label="Rainwater stored" value={stats ? liters(stats.storage) : "…"} detail={stats ? `${days(stats.cover)} of non-potable demand` : ""} />
+          <StatCard icon="storage" tone="cyan" label="Rainwater stored" value={stats ? liters(stats.storage) : "…"} detail={stats ? `${days(stats.cover)} of flushing and cleaning, if full` : ""} />
           <StatCard icon="trend" tone="violet" label="Adoption rate" value={stats ? `${Math.round(stats.adoption * 100)}%` : "…"} detail="households reusing greywater" />
           <StatCard icon="shield" tone="green" label="Barangays ready" value={stats ? `${stats.ready} / ${stats.count}` : "…"} detail="at the 3-day target" />
         </div>
@@ -300,6 +302,59 @@ export function OverviewScreen() {
         </aside>
       </div>
     </div>
+  );
+}
+
+// What AGOS does and why, for anyone opening the app for the first time (a judge's first question).
+function HowItWorks({ isStaff }: { isStaff: boolean }) {
+  const steps: { n: string; title: string; text: string; href: string; link: string }[] = [
+    {
+      n: "1",
+      title: "See where water can be used twice",
+      text: "Each barangay's shower and laundry water against its flushing need, and how long its stored rainwater would last.",
+      href: "/map",
+      link: "Reuse Map",
+    },
+    {
+      n: "2",
+      title: "Price what closes the gap",
+      text: "Tanks, drum covers and guidance cards, with the cost, days of cover gained and share of the disaster fund.",
+      href: isStaff ? "/designer" : "/map?outage=1",
+      link: isStaff ? "Program Designer" : "Outage Mode",
+    },
+    {
+      n: "3",
+      title: "Barangays report each quarter",
+      text: "Four numbers, even offline. Readiness updates, and the registry shows who needs help next.",
+      href: isStaff ? "/storage" : "/guide",
+      link: isStaff ? "Storage Registry" : "Household Guide",
+    },
+  ];
+  return (
+    <section className="mt-6 rounded-2xl border border-line bg-white p-5 shadow-[0_2px_6px_rgba(26,57,60,.06)] sm:p-7">
+      <p className="text-[10px] font-extrabold tracking-[0.18em] text-brand">WHAT AGOS DOES</p>
+      <p className="mt-1.5 max-w-3xl text-lg leading-snug font-extrabold tracking-[-0.01em] sm:text-xl">
+        AGOS doesn&apos;t make more drinking water. It helps the city use drinking-quality water only where it&apos;s needed.
+      </p>
+      <ol className="mt-4 grid gap-3 md:grid-cols-3">
+        {steps.map((s) => (
+          <li key={s.n} className="flex gap-3 rounded-xl bg-[#f4fafa] p-4">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-sm font-extrabold text-white">{s.n}</span>
+            <div className="min-w-0">
+              <p className="font-extrabold leading-snug">{s.title}</p>
+              <p className="mt-1 text-sm leading-snug text-[#4f5a5c]">{s.text}</p>
+              <Link href={s.href} className="mt-1.5 inline-block text-sm font-bold text-brand hover:underline">
+                {s.link} ›
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-4 text-sm leading-relaxed text-[#4f5a5c]">
+        <strong className="text-foreground">Why:</strong> in July 2026, high turbidity and a power outage cut Catbalogan&apos;s water supply to
+        30–40% of normal. Flushing, cleaning and laundry don&apos;t need drinking water, yet they take about 38% of what households use.
+      </p>
+    </section>
   );
 }
 
