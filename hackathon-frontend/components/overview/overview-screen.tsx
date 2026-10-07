@@ -86,7 +86,7 @@ export function OverviewScreen() {
         tone: filed ? "green" : "amber",
         icon: "clipboard",
         tag: "YOUR BARANGAY",
-        title: `${myBarangay.name}: ${days(myBarangay.metrics.days_of_cover)} of stored water, readiness ${myBarangay.metrics.readiness_score}/100`,
+        title: `${myBarangay.name}: ${days(myBarangay.metrics.days_of_cover)} of stored rainwater, readiness ${myBarangay.metrics.readiness_score}/100`,
         detail: filed ? `Your ${quarterLabel()} form is in.` : `Your ${quarterLabel()} form isn't in yet. Filing it adds 20 readiness points.`,
         href: "/form",
       });
@@ -100,8 +100,8 @@ export function OverviewScreen() {
         tag: "OUTAGE RISK",
         title: `${smallRed.name} runs out in under a day`,
         detail: user
-          ? `${days(smallRed.metrics.days_of_cover)} of stored water. Try tanks and drum covers in the Program Designer.`
-          : `${days(smallRed.metrics.days_of_cover)} of stored water. Outage Mode on the Reuse Map shows what a 3-day outage does.`,
+          ? `${days(smallRed.metrics.days_of_cover)} of stored rainwater. Try tanks and drum covers in the Program Designer.`
+          : `${days(smallRed.metrics.days_of_cover)} of stored rainwater. Outage Mode on the Reuse Map shows what a 3-day outage does.`,
         href: user ? "/designer" : "/map",
       });
     }
@@ -162,7 +162,7 @@ export function OverviewScreen() {
           </h1>
           <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[#687274]">
             {isStaff
-              ? "Your planning tools are ready: price a program, track stored water, and run outage scenarios before typhoon season."
+              ? "Your planning tools are ready: price a program, track stored rainwater, and run outage scenarios before typhoon season."
               : user
                 ? `File ${myBarangay ? `Brgy. ${myBarangay.name}'s` : "your barangay's"} quarterly form, even offline, and see how its readiness compares across the city.`
                 : "Plan safe reuse, strengthen local storage, and prepare every barangay for the next water interruption. Anyone can explore the map and the household guide."}
@@ -206,7 +206,7 @@ export function OverviewScreen() {
       ) : (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatCard icon="droplet" tone="cyan" label="Reuse potential" value={stats ? liters(stats.greywater) : "…"} detail="light greywater every day" />
-          <StatCard icon="storage" tone="cyan" label="Water secured" value={stats ? liters(stats.storage) : "…"} detail={stats ? `${days(stats.cover)} of non-potable demand` : ""} />
+          <StatCard icon="storage" tone="cyan" label="Rainwater stored" value={stats ? liters(stats.storage) : "…"} detail={stats ? `${days(stats.cover)} of non-potable demand` : ""} />
           <StatCard icon="trend" tone="violet" label="Adoption rate" value={stats ? `${Math.round(stats.adoption * 100)}%` : "…"} detail="households reusing greywater" />
           <StatCard icon="shield" tone="green" label="Barangays ready" value={stats ? `${stats.ready} / ${stats.count}` : "…"} detail="at the 3-day target" />
         </div>

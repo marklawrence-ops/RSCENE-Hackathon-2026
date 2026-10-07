@@ -5,7 +5,7 @@ export const metadata = { title: "Storage Registry · AGOS" };
 
 export default function StoragePage() {
   return (
-    <RequireAuth eyebrow="STORAGE REGISTRY" intro="Sign in to see stored water per barangay and export the quarterly summary.">
+    <RequireAuth eyebrow="STORAGE REGISTRY" intro="Sign in to see stored rainwater per barangay and export the quarterly summary.">
       <StorageScreen />
     </RequireAuth>
   );

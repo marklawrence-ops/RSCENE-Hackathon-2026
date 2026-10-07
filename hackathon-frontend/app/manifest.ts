@@ -30,7 +30,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     // Long-press the home-screen icon.
     shortcuts: [
-      { name: "Reuse Map", short_name: "Map", description: "Reuse and stored water per barangay", url: "/map", icons: ICON },
+      { name: "Reuse Map", short_name: "Map", description: "Reuse and stored rainwater per barangay", url: "/map", icons: ICON },
       { name: "Outage Mode", short_name: "Outage", description: "Which barangays run out in an outage", url: "/map?outage=1", icons: ICON },
       { name: "Barangay Form", short_name: "Form", description: "File this quarter's four numbers, even offline", url: "/form", icons: ICON },
       { name: "Household Guide", short_name: "Guide", description: "Safe reuse of rinse water and rain", url: "/guide", icons: ICON },

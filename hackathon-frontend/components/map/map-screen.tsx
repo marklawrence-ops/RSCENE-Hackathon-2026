@@ -11,7 +11,7 @@ import type { MapView } from "./barangay-map";
 import { BarangayPanel } from "./barangay-panel";
 import { DetailsSheet } from "./details-sheet";
 import { SitePanel } from "./site-panel";
-import { DataTag } from "./ui";
+import { DataTag, GreywaterRule } from "./ui";
 
 // Leaflet touches `window`, so the map only renders in the browser.
 const BarangayMap = dynamic(() => import("./barangay-map"), {
@@ -52,7 +52,7 @@ export function MapScreen() {
   const [scenarioSlug, setScenarioSlug] = useState<string>("turbid-power-cut");
   const [run, setRun] = useState<OutageRun | null>(null);
   const [view, setView] = useState<MapView>("town");
-  // Reuse first (it is the Reuse Map); /map?layer=storage opens on stored water.
+  // Reuse first (it is the Reuse Map); /map?layer=storage opens on stored rainwater.
   const [layer, setLayer] = useState<Layer>(() => (searchParams?.get("layer") === "storage" ? "storage" : "reuse"));
   const [summaryOpen, setSummaryOpen] = useState(false);
   // Only the latest click may fill the panel, even if an earlier request answers last.
@@ -123,7 +123,7 @@ export function MapScreen() {
   const showOutage = outageOn && run !== null;
 
   // Outage Mode: whether each barangay holds out. Otherwise the chosen layer:
-  // share of greywater already reused, or days of stored water.
+  // share of greywater already reused, or days of stored rainwater.
   const colorFor = useCallback(
     (b: BarangaySummary) => {
       if (showOutage) return STATUS[outageById.get(b.id)?.status ?? "green"].color;
@@ -139,7 +139,7 @@ export function MapScreen() {
         return r ? `${OUTCOME[r.outcome].label} · ${days(r.days_of_cover)}` : "";
       }
       if (layer === "reuse") return `${pct(reuseShare(b.metrics))} of households reuse water`;
-      return `${days(b.metrics.days_of_cover)} of stored water`;
+      return `${days(b.metrics.days_of_cover)} of stored rainwater`;
     },
     [showOutage, outageById, layer],
   );
@@ -229,7 +229,7 @@ export function MapScreen() {
             {(
               [
                 ["reuse", "Reuse"],
-                ["storage", "Stored water"],
+                ["storage", "Stored rainwater"],
               ] as const
             ).map(([key, label]) => (
               <button
@@ -263,7 +263,7 @@ export function MapScreen() {
       {/* Legend + view switch (hidden on phones while the details sheet is open) */}
       <div className={`glass absolute bottom-6 left-3 z-[1000] rounded-2xl p-2 text-xs sm:p-3 ${panelOpen ? "hidden lg:block" : ""}`}>
         <p className="mb-1.5 hidden font-bold sm:block">
-          {showOutage ? `${scenario?.name ?? "Outage"}` : layer === "reuse" ? "Households reusing water" : "Days of stored water"}
+          {showOutage ? `${scenario?.name ?? "Outage"}` : layer === "reuse" ? "Households reusing water" : "Days of stored rainwater (drums full)"}
         </p>
         <ul className="flex flex-wrap gap-x-3 gap-y-1 sm:block sm:space-y-1">
           {(showOutage
@@ -351,6 +351,7 @@ function CitySummary({ list, run, layer }: { list: BarangayList; run: OutageRun 
           A reusing household reuses on at least 3 days a week, about {pct(list.settings.reuse_fraction ?? 0.4)} of its greywater{" "}
           <DataTag status="assumed" />. Pale barangays reuse the least; click one for its reuse gap and buildings.
         </p>
+        <GreywaterRule className="mt-2" />
       </div>
     );
   }
@@ -373,7 +374,7 @@ function CitySummary({ list, run, layer }: { list: BarangayList; run: OutageRun 
         <strong className="text-foreground">{list.lgu.name}</strong> · {num(t.population)} people · {list.barangays.length} barangays <DataTag status="real" />
       </p>
       <p className="mt-2 text-[10px] font-extrabold tracking-[0.14em] text-brand">
-        {run ? `${run.scenario.name.toUpperCase()}, ${run.scenario.duration_days} DAYS` : "BARANGAYS BY DAYS OF STORED WATER"}
+        {run ? `${run.scenario.name.toUpperCase()}, ${run.scenario.duration_days} DAYS` : "BARANGAYS BY DAYS OF STORED RAINWATER"}
       </p>
       <div className="mt-1.5 grid grid-cols-3 gap-1.5 text-center">
         {tiles.map(([st, n, label]) => (
@@ -395,7 +396,7 @@ function CitySummary({ list, run, layer }: { list: BarangayList; run: OutageRun 
           <dd className="font-bold tabular-nums">{liters(reused)}/day</dd>
         </div>
         <div className="flex justify-between gap-2">
-          <dt className="text-[#5f6869]">Stored water, citywide</dt>
+          <dt className="text-[#5f6869]">Stored rainwater, citywide</dt>
           <dd className="font-bold tabular-nums">
             {liters(t.storage_liters)} · {days(t.days_of_cover)}
           </dd>

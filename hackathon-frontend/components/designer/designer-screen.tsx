@@ -6,7 +6,7 @@ import { endpoints } from "@/lib/api";
 import { days, liters, num, OUTCOME, peso, STATUS } from "@/lib/format";
 import type { BarangaySummary, OutageRun, ProgramInput, ProgramPreview } from "@/lib/types";
 import { useLguData } from "@/lib/use-lgu-data";
-import { StatusPill } from "../map/ui";
+import { GreywaterRule, StatusPill } from "../map/ui";
 
 const BarangayMap = dynamic(() => import("../map/barangay-map"), {
   ssr: false,
@@ -293,6 +293,7 @@ export function DesignerScreen() {
           format={(v) => `${v}%`}
           onChange={(v) => update({ adoption_rate: v / 100 })}
         />
+        <GreywaterRule />
       </section>
 
       {/* Results */}
@@ -313,7 +314,7 @@ export function DesignerScreen() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <Tile label="Water secured" value={liters(preview.liters_secured)} />
+                <Tile label="Rainwater stored" value={liters(preview.liters_secured)} />
                 <Tile
                   label={preview.barangays.length > 1 ? "Days of cover (average)" : "Days of cover"}
                   value={`${preview.days_of_cover.before.toFixed(1)} → ${preview.days_of_cover.after.toFixed(1)}`}

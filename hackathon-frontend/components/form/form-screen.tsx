@@ -230,7 +230,7 @@ export default function FormScreen() {
         <div className="mt-3 rounded-2xl border border-brand/30 bg-brand/5 p-3 text-sm">
           <p className="font-extrabold">Brgy. {snapshot.name} after your form</p>
           <p className="text-[#4f5a5c]">
-            Readiness {snapshot.readiness}/100 · stored water covers {days(snapshot.days)}
+            Readiness {snapshot.readiness}/100 · stored rainwater covers {days(snapshot.days)}
           </p>
         </div>
       )}

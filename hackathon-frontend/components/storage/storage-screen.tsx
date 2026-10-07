@@ -136,7 +136,7 @@ export function StorageScreen() {
             <strong className="font-extrabold" style={{ color: SOFT.green.ink }}>
               {counts.green} of {rows.length}
             </strong>{" "}
-            barangays can keep toilets and cleaning running for {target} days if the water stops. Citywide, stored water lasts about{" "}
+            barangays can keep toilets and cleaning running for {target} days if the water stops. Citywide, stored rainwater lasts about{" "}
             <strong className="font-extrabold">{days(t.days_of_cover)}</strong>. <DataTag status="simulated" />
           </p>
         </div>
@@ -187,7 +187,7 @@ export function StorageScreen() {
 
       {/* Key numbers in plain words */}
       <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-3 lg:grid-cols-4">
-        <Total label="Stored water" value={liters(t.storage_liters)} sub={`about ${days(t.days_of_cover)} for the whole city`} />
+        <Total label="Stored rainwater" value={liters(t.storage_liters)} sub={`about ${days(t.days_of_cover)} for the whole city`} />
         <Total label="Covered rain drums" value={num(t.covered_drums)} sub={`${num(totalShort)} more needed for ${target} days`} />
         <Total
           label="Public rain tanks"
@@ -202,7 +202,10 @@ export function StorageScreen() {
         <summary className="cursor-pointer font-bold text-brand">How to read this</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-[#4f5a5c]">
           <li>
-            <strong>Days of cover</strong> = stored water ÷ what the barangay uses each day for flushing and laundry (about 34 L a person).
+            <strong>Only rain is stored.</strong> Shower and laundry water is reused the same day at home and never counted here.
+          </li>
+          <li>
+            <strong>Days of cover</strong> = stored rainwater ÷ what the barangay uses each day for flushing and laundry (about 34 L a person), counting every tank and drum as full.
           </li>
           <li>
             The target is <strong>{target} days</strong>: about {perHouseholdTarget} covered {drumLiters} L drums per household.
@@ -261,7 +264,7 @@ export function StorageScreen() {
             </div>
 
             <div>
-              <CellLabel>Stored water</CellLabel>
+              <CellLabel>Stored rainwater</CellLabel>
               <div className="flex items-baseline justify-between gap-2 text-xs">
                 <span>
                   <strong className="text-[15px] font-extrabold tabular-nums sm:text-base">{r.days_of_cover.toFixed(1)}</strong> of {target} days
@@ -314,7 +317,7 @@ export function StorageScreen() {
 }
 
 const GROUPS: { status: Status; label: string; hint: (target: number) => string }[] = [
-  { status: "red", label: "Needs help", hint: () => "Under 1 day of stored water" },
+  { status: "red", label: "Needs help", hint: () => "Under 1 day of stored rainwater" },
   { status: "amber", label: "Getting there", hint: (target) => `1 to ${target} days` },
   { status: "green", label: "Ready", hint: (target) => `${target}+ days: toilets and cleaning keep running` },
 ];

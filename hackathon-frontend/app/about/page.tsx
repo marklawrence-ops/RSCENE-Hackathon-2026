@@ -42,7 +42,7 @@ const CONTEXT: Credit[] = [
     href: "https://www.leytesamardailynews.com/catbalogan-water-system-operating-at-just-30-capacity-amid-worsening-supply-crisis/",
     what: "Supply fell to 30–40% of normal capacity; piped water was rotated by district, with water trucks.",
   },
-  { name: "Catbalogan Water District", what: "Water tariff used to price the value of reused and stored water." },
+  { name: "Catbalogan Water District", what: "Water tariff used to price the value of reused water and stored rainwater." },
 ];
 
 const SOFTWARE: Credit[] = [
@@ -96,7 +96,7 @@ export default function AboutPage() {
       <h1 className="mt-1 text-3xl leading-tight font-extrabold tracking-[-0.035em]">About &amp; credits</h1>
       <p className="mt-2 text-[#5f6869]">
         AGOS, the Circular Water Network Planner, helps Catbalogan City see where shower, laundry and rain water can get a safe second use, and
-        how long each barangay&apos;s stored water would last in an outage. Built by Team Eight Bit for the rSCENE 2026 Hackathon (Circular
+        how long each barangay&apos;s stored rainwater would last in an outage. Built by Team Eight Bit for the rSCENE 2026 Hackathon (Circular
         Economy in Water Resources).
       </p>
 

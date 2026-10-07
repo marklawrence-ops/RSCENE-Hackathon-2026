@@ -65,7 +65,7 @@ export function LoginCard({
               Every drop gets <em className="text-[#ddf9f8] not-italic">a second purpose.</em>
             </h2>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/85">
-              Plan safe reuse, price a program, track stored water, and send each barangay&apos;s quarterly form, even offline.
+              Plan safe reuse, price a program, track stored rainwater, and send each barangay&apos;s quarterly form, even offline.
             </p>
           </div>
           <p className="relative z-10 text-[11px] text-white/70">No household names are collected.</p>

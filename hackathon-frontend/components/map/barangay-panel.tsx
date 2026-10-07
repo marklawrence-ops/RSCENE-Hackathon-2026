@@ -1,6 +1,6 @@
 import { CATEGORY_LABEL, days, liters, num, OUTCOME, STATUS } from "@/lib/format";
 import type { BarangayDetail, BarangaySummary, OutageRun, Site } from "@/lib/types";
-import { Bar, DataTag, SectionTitle, Stat, StatusPill } from "./ui";
+import { Bar, DataTag, GreywaterRule, SectionTitle, Stat, StatusPill } from "./ui";
 
 type Props = {
   barangay: BarangaySummary;
@@ -39,7 +39,7 @@ export function BarangayPanel({ barangay: b, detail, outage, scenarioName, sites
             {scenarioName}: {OUTCOME[outage.outcome].label.toLowerCase()}
           </p>
           <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-            Stored water lasts about <strong>{days(outage.days_of_cover)}</strong>
+            Stored rainwater lasts about <strong>{days(outage.days_of_cover)}</strong>
             {outage.shortfall_liters > 0 && <> · short by {liters(outage.shortfall_liters)}</>}.
           </p>
           {suggested && (
@@ -56,6 +56,7 @@ export function BarangayPanel({ barangay: b, detail, outage, scenarioName, sites
       </dl>
 
       <SectionTitle>Used water per day</SectionTitle>
+      <GreywaterRule className="mb-2" />
       <dl>
         <Stat label="Light greywater (shower, laundry)" value={liters(m.greywater_lpd)} tag="assumed" />
         <Stat label="Toilet flushing demand" value={liters(m.flushing_demand_lpd)} tag="assumed" />
@@ -88,12 +89,12 @@ export function BarangayPanel({ barangay: b, detail, outage, scenarioName, sites
         </p>
       </div>
 
-      <SectionTitle>Outage reserve</SectionTitle>
+      <SectionTitle>Outage reserve: stored rainwater</SectionTitle>
       <p className="text-sm">
-        Stored water covers about <strong>{days(m.days_of_cover)}</strong> of non-potable demand ({liters(m.nonpotable_demand_lpd)} a day).
+        Stored rainwater covers about <strong>{days(m.days_of_cover)}</strong> of flushing and cleaning ({liters(m.nonpotable_demand_lpd)} a day), if tanks and drums are full.
       </p>
       <dl className="mt-1">
-        <Stat label="Storage (tanks + covered drums)" value={liters(m.storage_liters)} tag={m.data_status.storage} />
+        <Stat label="Rainwater stored (tanks + covered drums)" value={liters(m.storage_liters)} tag={m.data_status.storage} />
         {detail && <Stat label="Drums per household for 3 days" value={String(detail.drums_per_household_for_target)} />}
       </dl>
 

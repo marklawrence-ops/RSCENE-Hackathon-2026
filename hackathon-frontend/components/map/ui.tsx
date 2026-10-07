@@ -48,3 +48,17 @@ export function Bar({ value, max, color }: { value: number; max: number; color: 
 export function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="mt-5 mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">{children}</h3>;
 }
+
+/** The one rule judges and residents most often get wrong: greywater is never stored. */
+export function GreywaterRule({ className = "" }: { className?: string }) {
+  return (
+    <p className={`flex gap-2 rounded-xl bg-[#eaf7f8] px-3 py-2 text-xs leading-snug text-[#24464a] ${className}`}>
+      <span aria-hidden className="font-extrabold text-brand">
+        ↻
+      </span>
+      <span>
+        <strong>Shower and laundry water is used the same day, never stored.</strong> Only rain is stored, in covered drums and tanks.
+      </span>
+    </p>
+  );
+}
