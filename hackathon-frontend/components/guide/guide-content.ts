@@ -8,6 +8,12 @@ export type GuideText = {
   draft: boolean;
   title: string;
   intro: string;
+  greyTitle: string;
+  greyIntro: string;
+  greyYesTitle: string;
+  greyYes: string[];
+  greyNoTitle: string;
+  greyNo: string[];
   startTitle: string;
   startItems: string[];
   gainTitle: string;
@@ -35,6 +41,21 @@ export const GUIDE: Record<Lang, GuideText> = {
     draft: false,
     title: "Use water twice, safely",
     intro: "Most water at home does not need to be drinking water. Rinse water and rain can do a second job: flushing, cleaning and watering plants.",
+    greyTitle: "What counts as greywater?",
+    greyIntro: "Greywater is water you have already used once that is still fairly clean. Reuse it the same day; never store it.",
+    greyYesTitle: "Greywater you can reuse",
+    greyYes: [
+      "Shower and bath water",
+      "Laundry rinse water (the clearer rinses after washing)",
+      "Bathroom sink water from washing hands or face",
+    ],
+    greyNoTitle: "Not greywater: never reuse",
+    greyNo: [
+      "Toilet water",
+      "Kitchen sink and dishwashing water (grease and food scraps)",
+      "Water from washing diapers or very soiled clothes",
+      "Water with bleach or strong cleaners",
+    ],
     startTitle: "Start in 10 minutes",
     startItems: [
       "Rain: put a drum with a lid under the roof edge or downspout. Let the first few minutes of rain run off before you fill it.",
@@ -86,6 +107,21 @@ export const GUIDE: Record<Lang, GuideText> = {
     draft: true,
     title: "Gamitin ang tubig nang dalawang beses, nang ligtas",
     intro: "Karamihan sa tubig sa bahay ay hindi kailangang maiinom. Ang pinagbanlawan at tubig-ulan ay puwedeng gamitin ulit sa pag-flush, paglilinis at pagdidilig.",
+    greyTitle: "Ano ang greywater?",
+    greyIntro: "Ang greywater ay tubig na nagamit na nang isang beses pero medyo malinis pa. Gamitin ulit sa araw ding iyon; huwag iimbak.",
+    greyYesTitle: "Greywater na puwedeng gamitin ulit",
+    greyYes: [
+      "Tubig mula sa paliligo",
+      "Pinagbanlawan ng labada (ang mas malinaw na banlaw pagkatapos maglaba)",
+      "Tubig mula sa lababo ng banyo na pinaghugasan ng kamay o mukha",
+    ],
+    greyNoTitle: "Hindi greywater: huwag kailanman gamitin ulit",
+    greyNo: [
+      "Tubig mula sa inidoro",
+      "Tubig mula sa lababo ng kusina at pinaghugasan ng pinggan (may mantika at tira-tirang pagkain)",
+      "Tubig na pinaglabhan ng lampin o maruruming damit",
+      "Tubig na may bleach o matapang na panlinis",
+    ],
     startTitle: "Simulan sa loob ng 10 minuto",
     startItems: [
       "Ulan: maglagay ng drum na may takip sa ilalim ng alulod o gilid ng bubong. Palipasin muna ang unang ilang minuto ng ulan bago sahurin.",
@@ -137,6 +173,21 @@ export const GUIDE: Record<Lang, GuideText> = {
     draft: true,
     title: "Gamita liwat an tubig, ha luwas nga paagi",
     intro: "Damo nga tubig ha balay an diri kinahanglan nga mainom. An binanlawan ngan an tubig-uran puydi gamiton liwat pag-flush, paglimpyo ngan pagbubu ha tanom.",
+    greyTitle: "Ano an greywater?",
+    greyIntro: "An greywater amo an tubig nga nagamit na hin makausa pero medyo malimpyo pa. Gamita liwat ha sugad nga adlaw; ayaw tipiga.",
+    greyYesTitle: "Greywater nga puydi gamiton liwat",
+    greyYes: [
+      "Tubig tikang ha pagdigo",
+      "Binanlawan han labada (an mas matin-aw nga banlaw kahuman maglaba)",
+      "Tubig tikang ha lababo han banyo nga ginhugasan han kamot o bayhon",
+    ],
+    greyNoTitle: "Diri greywater: ayaw gud gamita liwat",
+    greyNo: [
+      "Tubig tikang ha kasilyas",
+      "Tubig tikang ha lababo han kusina ngan ginhugasan han pinggan (may mantika ngan sobra nga pagkaon)",
+      "Tubig nga ginlabhan han lampin o mahugaw gud nga bado",
+      "Tubig nga may bleach o makusog nga panlimpyo",
+    ],
     startTitle: "Tikanga ha sulod hin 10 minuto",
     startItems: [
       "Uran: butangi hin drum nga may takop ha ilarom han alulod o sidsid han atop. Pabay-i anay an siyahan nga pipira ka minuto han uran antes sahuron.",

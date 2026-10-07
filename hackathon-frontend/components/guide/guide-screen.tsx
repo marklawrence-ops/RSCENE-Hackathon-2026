@@ -40,7 +40,30 @@ export function GuideScreen() {
       <h1 className="mt-1 text-3xl leading-tight font-extrabold tracking-[-0.035em] print:mt-0">{t.title}</h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400 print:text-black">{t.intro}</p>
 
-      <section className="mt-5 rounded-2xl border border-brand/30 bg-[#eaf7f8] p-4 print:break-inside-avoid">
+      <section className="mt-5 rounded-2xl border border-black/10 p-4 print:break-inside-avoid">
+        <h2 className="text-lg font-semibold">{t.greyTitle}</h2>
+        <p className="mt-1 text-sm text-zinc-600 print:text-black">{t.greyIntro}</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl bg-emerald-50 p-3">
+            <p className="text-sm font-semibold text-emerald-900">✓ {t.greyYesTitle}</p>
+            <ul className="mt-1.5 list-disc space-y-1 pl-5 text-sm">
+              {t.greyYes.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-xl bg-red-50 p-3">
+            <p className="text-sm font-semibold text-red-900">✕ {t.greyNoTitle}</p>
+            <ul className="mt-1.5 list-disc space-y-1 pl-5 text-sm">
+              {t.greyNo.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-3 rounded-2xl border border-brand/30 bg-[#eaf7f8] p-4 print:break-inside-avoid">
         <h2 className="text-lg font-semibold">{t.startTitle}</h2>
         <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm">
           {t.startItems.map((item) => (
