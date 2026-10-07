@@ -40,7 +40,25 @@ export function GuideScreen() {
       <h1 className="mt-1 text-3xl leading-tight font-extrabold tracking-[-0.035em] print:mt-0">{t.title}</h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400 print:text-black">{t.intro}</p>
 
-      <section className="mt-5 rounded-2xl border border-emerald-600/30 bg-emerald-50 p-4 dark:bg-emerald-950/30 print:break-inside-avoid">
+      <section className="mt-5 rounded-2xl border border-brand/30 bg-[#eaf7f8] p-4 print:break-inside-avoid">
+        <h2 className="text-lg font-semibold">{t.startTitle}</h2>
+        <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm">
+          {t.startItems.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="mt-3 rounded-2xl border border-black/10 p-4 print:break-inside-avoid">
+        <h2 className="text-lg font-semibold">{t.gainTitle}</h2>
+        <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm">
+          {t.gainItems.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-3 rounded-2xl border border-emerald-600/30 bg-emerald-50 p-4 dark:bg-emerald-950/30 print:break-inside-avoid">
         <h2 className="text-lg font-semibold text-emerald-900 dark:text-emerald-200">✓ {t.doTitle}</h2>
         <ul className="mt-2 space-y-2.5">
           {t.doItems.map(([from, to]) => (

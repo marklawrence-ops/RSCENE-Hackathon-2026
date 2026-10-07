@@ -8,6 +8,10 @@ export type GuideText = {
   draft: boolean;
   title: string;
   intro: string;
+  startTitle: string;
+  startItems: string[];
+  gainTitle: string;
+  gainItems: string[];
   doTitle: string;
   doItems: [string, string][]; // [from, to]
   neverTitle: string;
@@ -31,6 +35,20 @@ export const GUIDE: Record<Lang, GuideText> = {
     draft: false,
     title: "Use water twice, safely",
     intro: "Most water at home does not need to be drinking water. Rinse water and rain can do a second job: flushing, cleaning and watering plants.",
+    startTitle: "Start in 10 minutes",
+    startItems: [
+      "Rain: put a drum with a lid under the roof edge or downspout. Let the first few minutes of rain run off before you fill it.",
+      `Keep it covered with the lid or a tied cloth, and label it "${DRUM_LABEL}".`,
+      "Rinse water: catch the last laundry rinse in a basin and use it to flush the toilet the same day.",
+      "Shower water: pour it on the soil around plants, the same day.",
+    ],
+    gainTitle: "What's in it for your household",
+    gainItems: [
+      "Your toilet keeps working when the water stops: three covered drums give a family of five about 3 days of flushing and washing.",
+      "A smaller water bill: reusing rinse water saves a family of five about ₱60 a month at water-district base rates.",
+      "Fewer mosquitoes: covering water containers follows the DOH's dengue-prevention advice.",
+      "A free drum cover if your barangay is in the pilot, and your barangay's readiness shows on the city map.",
+    ],
     doTitle: "Do this",
     doItems: [
       ["Laundry rinse water", "Flush the toilet"],
@@ -68,6 +86,20 @@ export const GUIDE: Record<Lang, GuideText> = {
     draft: true,
     title: "Gamitin ang tubig nang dalawang beses, nang ligtas",
     intro: "Karamihan sa tubig sa bahay ay hindi kailangang maiinom. Ang pinagbanlawan at tubig-ulan ay puwedeng gamitin ulit sa pag-flush, paglilinis at pagdidilig.",
+    startTitle: "Simulan sa loob ng 10 minuto",
+    startItems: [
+      "Ulan: maglagay ng drum na may takip sa ilalim ng alulod o gilid ng bubong. Palipasin muna ang unang ilang minuto ng ulan bago sahurin.",
+      `Laging takpan ng takip o nakataling tela, at lagyan ng label: "${DRUM_LABEL}".`,
+      "Pinagbanlawan: saluhin sa palanggana ang huling banlaw ng labada at gamitin itong pang-flush sa araw ding iyon.",
+      "Tubig mula sa paliligo: ibuhos sa lupa sa paligid ng halaman, sa araw ding iyon.",
+    ],
+    gainTitle: "Ano ang pakinabang sa inyong pamilya",
+    gainItems: [
+      "Gumagana pa rin ang inidoro kapag nawalan ng tubig: ang tatlong drum na may takip ay sapat sa pamilyang may lima nang mga 3 araw.",
+      "Mas mababang bayarin sa tubig: ang paggamit ulit ng pinagbanlawan ay makatitipid nang mga ₱60 kada buwan sa pamilyang may lima.",
+      "Mas kaunting lamok: ang pagtatakip ng lalagyan ng tubig ay ayon sa payo ng DOH laban sa dengue.",
+      "Libreng takip ng drum kung kasali ang inyong barangay sa pilot, at makikita sa mapa ng lungsod ang kahandaan ng inyong barangay.",
+    ],
     doTitle: "Gawin ito",
     doItems: [
       ["Pinagbanlawan ng labada", "Pang-flush ng inidoro"],
@@ -105,6 +137,20 @@ export const GUIDE: Record<Lang, GuideText> = {
     draft: true,
     title: "Gamita liwat an tubig, ha luwas nga paagi",
     intro: "Damo nga tubig ha balay an diri kinahanglan nga mainom. An binanlawan ngan an tubig-uran puydi gamiton liwat pag-flush, paglimpyo ngan pagbubu ha tanom.",
+    startTitle: "Tikanga ha sulod hin 10 minuto",
+    startItems: [
+      "Uran: butangi hin drum nga may takop ha ilarom han alulod o sidsid han atop. Pabay-i anay an siyahan nga pipira ka minuto han uran antes sahuron.",
+      `Pirme takpi hin takop o tela nga gin-higot, ngan butangi hin label: "${DRUM_LABEL}".`,
+      "Binanlawan: sahura ha palanggana an urhi nga banlaw han labada ngan gamita pag-flush ha sugad nga adlaw.",
+      "Tubig tikang ha pagdigo: ibubu ha tuna palibot han tanom, ha sugad nga adlaw.",
+    ],
+    gainTitle: "Ano an kaupayan para ha iyo pamilya",
+    gainItems: [
+      "Nagana gihapon an kasilyas kun mawara an tubig: an tulo nga drum nga may takop igo para ha pamilya nga lima ha mga tulo ka adlaw.",
+      "Mas gutiay nga bayaran ha tubig: an paggamit liwat han binanlawan makakatipig hin mga ₱60 kada bulan para ha pamilya nga lima.",
+      "Mas gutiay nga namok: an pagtakop han surudlan han tubig uyon ha tambag han DOH kontra dengue.",
+      "Libre nga takop han drum kun kaapi an iyo barangay ha pilot, ngan makikita ha mapa han syudad an kahimanan han iyo barangay.",
+    ],
     doTitle: "Buhata ini",
     doItems: [
       ["Binanlawan han labada", "Pag-flush han kasilyas"],
