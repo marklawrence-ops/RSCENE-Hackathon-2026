@@ -10,14 +10,15 @@ import type { Role } from "@/lib/types";
 import { Icon, type IconName } from "./icon";
 import { Weather } from "./weather";
 
-// auth: shown only to signed-in users (the pages themselves also ask for sign-in).
-const NAV: { href: string; label: string; icon: IconName; auth?: boolean }[] = [
+// auth: shown only to signed-in users; staff: only to planners and the CDRRMO (the pages check too).
+const NAV: { href: string; label: string; icon: IconName; auth?: boolean; staff?: boolean }[] = [
   { href: "/", label: "Overview", icon: "grid" },
   // Outage Mode is a toggle on the Reuse Map, not a separate tab.
   { href: "/map", label: "Reuse Map", icon: "map" },
   { href: "/designer", label: "Program Designer", icon: "sliders", auth: true },
   { href: "/storage", label: "Storage Registry", icon: "storage", auth: true },
   { href: "/form", label: "Barangay Form", icon: "clipboard", auth: true },
+  { href: "/reports", label: "Reports", icon: "trend", auth: true, staff: true },
   { href: "/guide", label: "Household Guide", icon: "book" },
   { href: "/about", label: "About & credits", icon: "people" },
 ];
@@ -75,7 +76,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
       <p className="mx-3 mt-9 mb-2.5 text-[10px] font-extrabold tracking-[0.18em] text-[#6b7475]">PLANNING PORTAL</p>
       <nav className="flex flex-col gap-1">
-        {NAV.filter((item) => !item.auth || user).map((item) => {
+        {NAV.filter((item) => (!item.auth || user) && (!item.staff || (user && user.role !== "barangay"))).map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
           return (
             <Link

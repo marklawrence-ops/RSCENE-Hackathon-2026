@@ -167,3 +167,10 @@ body {
     transform: scale(1.4);
   }
 }
+
+/* Printed reports: comfortable margins on A4 / Letter. */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+}
