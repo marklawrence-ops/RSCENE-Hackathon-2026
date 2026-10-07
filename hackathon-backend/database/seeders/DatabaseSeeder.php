@@ -61,7 +61,11 @@ class DatabaseSeeder extends Seeder
                 'guidance_card' => 8,
                 'training_session' => 15000,
             ],
-            'tariff_min_charge_php' => 175,
+            // Catbalogan Water District, 1/2" domestic connection: LWUA Region 8 rates as of June 30, 2023
+            // (approved Feb 13, 2018). Base tariff before VAT; used only for tariff-equivalent values.
+            'tariff_min_charge_php' => 200,
+            'tariff_min_m3' => 10,
+            'tariff_php_per_m3' => 22.15,
             'rollout_per_year_php' => ['min' => 900000, 'max' => 1700000],
             // Map opens on the mainland town area (49 of 57 barangays); "Whole city" adds the western islands and Basiao.
             'default_bounds' => [[11.735, 124.815], [11.91, 124.935]],

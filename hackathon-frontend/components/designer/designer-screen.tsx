@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { endpoints } from "@/lib/api";
+import { m3PerYear, tariffEquivalent, tariffOf } from "@/lib/economics";
 import { days, liters, num, OUTCOME, peso, STATUS } from "@/lib/format";
 import type { BarangaySummary, OutageRun, ProgramInput, ProgramPreview } from "@/lib/types";
 import { useLguData } from "@/lib/use-lgu-data";
@@ -335,11 +336,17 @@ export function DesignerScreen() {
                     </li>
                   ))}
                 </ul>
-                {preview.barangays.length === 1 && (
-                  <p className="mt-2 text-xs text-zinc-500">
-                    Greywater reused: {liters(preview.barangays[0].greywater_reused_lpd_before)} → {liters(preview.barangays[0].greywater_reused_lpd_after)} a day
-                  </p>
-                )}
+                {(() => {
+                  const before = preview.barangays.reduce((s, r) => s + r.greywater_reused_lpd_before, 0);
+                  const after = preview.barangays.reduce((s, r) => s + r.greywater_reused_lpd_after, 0);
+                  const t = data ? tariffOf(data.list.settings) : null;
+                  return (
+                    <p className="mt-2 text-xs text-zinc-500">
+                      Greywater reused: {liters(before)} → {liters(after)} a day, freeing {num(m3PerYear(before))} → {num(m3PerYear(after))} m³ of treated water a year
+                      {t && <> (≈ {peso(tariffEquivalent(after - before, t))} a year more, tariff equivalent)</>}.
+                    </p>
+                  );
+                })()}
               </div>
 
               <div>

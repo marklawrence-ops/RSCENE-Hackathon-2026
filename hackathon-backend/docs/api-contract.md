@@ -159,7 +159,7 @@ Request `{ "email": "cdrrmo@demo.test", "password": "…", "device_name": "pixel
 ```json
 {
   "lgu": { "...": "Lgu" },
-  "settings": { "liters_per_person_day": 90.09, "household_size": 5, "drum_liters": 200, "target_days_of_cover": 3, "reuse_fraction": 0.4 },
+  "settings": { "liters_per_person_day": 90.09, "household_size": 5, "drum_liters": 200, "target_days_of_cover": 3, "reuse_fraction": 0.4, "tariff": { "min_charge_php": 200, "min_m3": 10, "php_per_m3": 22.15 } },
   "totals": { "population": 106440, "greywater_lpd": 4987000, "storage_liters": 0, "days_of_cover": 0.0, "status_counts": { "green": 0, "amber": 0, "red": 57 } },
   "barangays": [ "BarangaySummary", "…" ]
 }

@@ -37,6 +37,9 @@ class WaterModel
 
     private float $reuseFraction;
 
+    /** @var array{min_charge_php: float, min_m3: float, php_per_m3: float} */
+    private array $tariff;
+
     public function __construct(private Lgu $lgu)
     {
         $s = $lgu->settings;
@@ -47,6 +50,11 @@ class WaterModel
         $this->targetDays = (float) ($s['target_days_of_cover'] ?? 3);
         $this->runoff = (float) ($s['runoff_coefficient'] ?? 0.8);
         $this->reuseFraction = (float) ($s['reuse_fraction'] ?? 0.4);
+        $this->tariff = [
+            'min_charge_php' => (float) ($s['tariff_min_charge_php'] ?? 200),
+            'min_m3' => (float) ($s['tariff_min_m3'] ?? 10),
+            'php_per_m3' => (float) ($s['tariff_php_per_m3'] ?? 22.15),
+        ];
         $this->annualRainMm = $this->lastTwelveMonthsRain() ?? (float) ($s['annual_rainfall_mm'] ?? 2991);
     }
 
@@ -73,7 +81,7 @@ class WaterModel
     }
 
     /**
-     * @return array{liters_per_person_day: float, household_size: int, drum_liters: int, target_days_of_cover: float}
+     * @return array{liters_per_person_day: float, household_size: int, drum_liters: int, target_days_of_cover: float, reuse_fraction: float, tariff: array{min_charge_php: float, min_m3: float, php_per_m3: float}}
      */
     public function publicSettings(): array
     {
@@ -83,6 +91,7 @@ class WaterModel
             'drum_liters' => $this->drumLiters,
             'target_days_of_cover' => $this->targetDays,
             'reuse_fraction' => $this->reuseFraction,
+            'tariff' => $this->tariff,
         ];
     }
 

@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { endpoints } from "@/lib/api";
 import { useAuthUser } from "@/lib/auth";
-import { CATEGORY_LABEL, days, liters, num, OUTCOME, pct, STATUS } from "@/lib/format";
+import { CATEGORY_LABEL, days, liters, num, OUTCOME, pct, peso, STATUS } from "@/lib/format";
 import type { BarangayForm, BarangaySummary, OutageRun, StorageRegistry } from "@/lib/types";
+import { householdSaving, m3PerYear, tariffEquivalent, tariffOf } from "@/lib/economics";
 import { useLguData } from "@/lib/use-lgu-data";
 
 // Printable reports built only from live AGOS data: fixed wording, real numbers, nothing generated.
@@ -278,7 +279,9 @@ function QuarterlyReport({ data, registry, run, preparedBy }: { data: Data; regi
           ["Stored rainwater (if full)", `${liters(t.storage_liters)} = ${days(t.days_of_cover)} citywide`, "Reported / simulated"],
           ["Public tanks · covered drums", `${num(registry.totals.public_tanks)} · ${num(registry.totals.covered_drums)}`, "Reported / simulated"],
           ["Households reusing greywater", `${num(reusing)} of ${num(households)} (${pct(households ? reusing / households : 0)})`, "Reported / simulated"],
-          ["Greywater reused", `${liters(reused)} a day ≈ ${num((reused * 365) / 1000)} m³ a year`, "Estimate"],
+          ["Greywater reused", `${liters(reused)} a day`, "Estimate"],
+          ["Treated water freed by reuse", `${num(m3PerYear(reused))} m³ a year (≈ ${peso(tariffEquivalent(reused, tariffOf(l.settings)))} tariff equivalent)`, "Estimate · water-district base tariff"],
+          ["Example household saving", `≈ ${peso(householdSaving(l.settings).perMonth)} a month for a family of ${l.settings.household_size} that reuses`, "Estimate · base tariff, before VAT"],
           ["Greywater still going down the drain", `${liters(t.greywater_lpd - reused)} a day`, "Estimate"],
           [`Forms filed for ${quarterLabel()}`, `${filed.length} of ${bs.length}`, "Reported"],
         ]}

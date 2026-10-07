@@ -243,3 +243,11 @@ describe('barangay forms', function () {
             ->assertJsonValidationErrors(['reusing_households', 'period']);
     });
 });
+
+test('settings expose the water-district base tariff for tariff-equivalent values', function () {
+    $this->getJson('/api/v1/lgus/catbalogan/barangays')
+        ->assertOk()
+        ->assertJsonPath('settings.tariff.min_charge_php', 200)
+        ->assertJsonPath('settings.tariff.min_m3', 10)
+        ->assertJsonPath('settings.tariff.php_per_m3', 22.15);
+});

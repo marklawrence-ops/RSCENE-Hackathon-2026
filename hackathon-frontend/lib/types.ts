@@ -37,6 +37,8 @@ export type LguSettings = {
   target_days_of_cover: number;
   /** Share of its greywater a reusing household actually reuses (assumed). */
   reuse_fraction: number;
+  /** Water-district base tariff (before VAT), for tariff-equivalent values. */
+  tariff?: { min_charge_php: number; min_m3: number; php_per_m3: number };
 };
 
 export type BarangayMetrics = {

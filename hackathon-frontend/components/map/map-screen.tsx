@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { endpoints } from "@/lib/api";
-import { days, liters, num, OUTCOME, pct, REUSE_BANDS, reuseBand, reuseShare, STATUS } from "@/lib/format";
+import { m3PerYear, tariffEquivalent, tariffOf } from "@/lib/economics";
+import { days, liters, num, OUTCOME, pct, peso, REUSE_BANDS, reuseBand, reuseShare, STATUS } from "@/lib/format";
 import type { BarangayDetail, BarangayList, BarangaySummary, OutageRun, Site, SiteMatches } from "@/lib/types";
 import { useLguData } from "@/lib/use-lgu-data";
 import type { MapView } from "./barangay-map";
@@ -339,6 +340,14 @@ function CitySummary({ list, run, layer }: { list: BarangayList; run: OutageRun 
           <div className="flex justify-between gap-2">
             <dt className="text-[#5f6869]">Reused today (estimate)</dt>
             <dd className="font-bold tabular-nums">{liters(reused)}/day</dd>
+          </div>
+          <div className="flex justify-between gap-2">
+            <dt className="text-[#5f6869]">Treated water freed</dt>
+            <dd className="font-bold tabular-nums">{num(m3PerYear(reused))} m³/year</dd>
+          </div>
+          <div className="flex justify-between gap-2">
+            <dt className="text-[#5f6869]">Tariff equivalent</dt>
+            <dd className="font-bold tabular-nums">≈ {peso(tariffEquivalent(reused, tariffOf(list.settings)))}/year</dd>
           </div>
           <div className="flex justify-between gap-2">
             <dt className="text-[#5f6869]">Households reusing</dt>
